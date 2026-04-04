@@ -40,7 +40,7 @@ export default function LandingPage() {
             </Link>
           </nav>
           <Link
-            href="https://github.com/mikkelrask/mrdoom/releases/latest"
+            href="https://github.com/mikkelrask/uaclaunchcontrol/releases/latest"
             target="_blank"
             className="hidden md:flex items-center gap-2 bg-red-900/30 hover:bg-red-900/50 px-4 py-2 border border-red-900/50 uppercase text-xs tracking-wider transition-colors"
           >
@@ -73,10 +73,10 @@ export default function LandingPage() {
                 custom Doom mod "remixes".
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="https://github.com/mikkelrask/mrdoom/releases" target="_blank">
+                <Link href="https://github.com/mikkelrask/uaclaunchcontrol/releases" target="_blank">
                   <Button className="bg-red-900 hover:bg-red-800 text-white border border-red-700 uppercase tracking-wider">
                     <AppWindow className="mr-2 h-4 w-4" />
-                    DOWNLOAD E1M0.1.2
+                    DOWNLOAD E1M0.2.1
                   </Button>
                 </Link>
                 <Link href="#RTFM">
@@ -472,7 +472,7 @@ export default function LandingPage() {
               Download the Doom Mod Launcher now and take your Doom experience to the next level. Free and open source.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="https://github.com/mikkelrask/mrdoom/releases/latest" target="_blank">
+              <Link href="https://github.com/mikkelrask/uaclaunchcontrol/releases/latest" target="_blank">
                 <Button
                   size="lg"
                   className="bg-red-900 hover:bg-red-800 text-white border border-red-700 uppercase tracking-wider w-full sm:w-auto"
@@ -481,7 +481,7 @@ export default function LandingPage() {
                   GET APPLICATION
                 </Button>
               </Link>
-              <Link href="https://github.com/mikkelrask/mrdoom" target="_blank">
+              <Link href="https://github.com/mikkelrask/uaclaunchcontrol" target="_blank">
                 <Button
                   size="lg"
                   variant="outline"
@@ -515,7 +515,7 @@ export default function LandingPage() {
             </div>
             <div className="flex gap-6">
               <Link
-                href="https://github.com/mikkelrask/mrdoom"
+                href="https://github.com/mikkelrask/uaclaunchcontrol"
                 target="_blank"
                 className="text-zinc-400 hover:text-red-500 transition-colors"
               >
