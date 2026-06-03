@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 export const metadata = {
   title: "UAC Launch Control - Manage Your Doom Mods With Ease",
   description:
-    "A powerful, UAC-developed launcher that makes it simple to create, manage, and play your custom Doom mod combinations."
+    "A powerful, UAC-developed launcher for creating, managing, launching, and sharing custom Doom mod protocols."
 }
 
 export default function RootLayout({

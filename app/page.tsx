@@ -76,7 +76,7 @@ export default function LandingPage() {
                 <Link href="https://github.com/mikkelrask/uaclaunchcontrol/releases" target="_blank">
                   <Button className="bg-red-900 hover:bg-red-800 text-white border border-red-700 uppercase tracking-wider">
                     <AppWindow className="mr-2 h-4 w-4" />
-                    DOWNLOAD E1M0.2.1
+                    DOWNLOAD E1M0.3.5
                   </Button>
                 </Link>
                 <Link href="#RTFM">
@@ -296,10 +296,10 @@ export default function LandingPage() {
               <div className="bg-red-900/20 w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-red-900/30 transition-colors">
                 <Cpu className="h-6 w-6 text-red-500" />
               </div>
-              <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">Conflict Resolution</h3>
+              <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">WAD Import & Library</h3>
               <div className="h-px w-16 bg-red-900/50 mb-4"></div>
               <p className="text-zinc-400">
-                Automatically detect and resolve conflicts between mods to ensure smooth gameplay.
+                Drag-and-drop WAD files to import them with automatic hash verification and build your personal mod library.
               </p>
             </div>
 
@@ -332,10 +332,10 @@ export default function LandingPage() {
               <div className="bg-red-900/20 w-12 h-12 flex items-center justify-center mb-4 group-hover:bg-red-900/30 transition-colors">
                 <Layers className="h-6 w-6 text-red-500" />
               </div>
-              <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">Mod Discovery</h3>
+              <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">Protocol Import/Export</h3>
               <div className="h-px w-16 bg-red-900/50 mb-4"></div>
               <p className="text-zinc-400">
-                Discover new mods and popular combinations from the community directly within the launcher.
+                Export your mod combinations as shareable JSON files or import from existing configs and .bat files.
               </p>
             </div>
           </div>
@@ -372,7 +372,7 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">Import Your Mods</h3>
               <div className="h-px w-16 bg-red-900/50 mb-4"></div>
               <p className="text-zinc-400">
-                Add your existing mod files to the launcher or download new ones directly from the app.
+                Add your existing mod files to the launcher via drag-and-drop or by browsing your file system.
               </p>
             </div>
 
@@ -384,8 +384,7 @@ export default function LandingPage() {
               <h3 className="text-xl font-bold mb-2 uppercase tracking-wider">Create Combinations</h3>
               <div className="h-px w-16 bg-red-900/50 mb-4"></div>
               <p className="text-zinc-400">
-                Drag and drop mods to create your perfect combination. The launcher will handle load order and
-                conflicts.
+                Drag and drop mods to create your perfect combination. The launcher manages load order and launch parameters.
               </p>
             </div>
 
@@ -421,7 +420,7 @@ export default function LandingPage() {
               <div className="h-px bg-red-900/50 w-16"></div>
             </div>
             <p className="text-zinc-400 max-w-2xl mx-auto">
-              A powerful interface designed for both beginners and advanced Doom modders.
+              A feature-rich interface with grid, list, and detail views for managing all your Doom mod protocols.
             </p>
           </div>
 
@@ -430,7 +429,7 @@ export default function LandingPage() {
             <div className="relative border-2 border-red-900/50 overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-8 bg-red-900/30 flex items-center px-3 z-10">
                 <div className="w-3 h-3 rounded-full bg-red-600 mr-2"></div>
-                <span className="text-xs text-red-200 uppercase tracking-wider">UAC TERMINAL // MOD MANAGER v1.0</span>
+                <span className="text-xs text-red-200 uppercase tracking-wider">UAC TERMINAL // LAUNCH CONTROL v0.3.5</span>
               </div>
               <div className="pt-8">
                 <Image
