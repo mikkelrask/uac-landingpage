@@ -26,18 +26,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        id: pnpm-install
-        with:
-          version: latest
-          run_install: false
-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Build site
-        run: pnpm build
+        run: npm run build
         env:
           BASE_URL: /uac-launch-control-web/
 
