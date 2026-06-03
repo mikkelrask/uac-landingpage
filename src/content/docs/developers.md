@@ -1,0 +1,309 @@
+---
+title: For Developers
+description: Technical details about UAC Launch Control — architecture, setup, API, and contribution guide.
+---
+
+A little about the technical details of the **UAC Launch Control** app — if you want to contribute, or build for yourself, read more below.
+
+You can also check out the more detailed explanation about the project and its structure on **[DeepWiki](https://deepwiki.com/mikkelrask/uaclaunchcontrol)**.
+
+> **Note:** This document gets updated frequently during early development. If you run into any trouble, please open an issue or reach out.
+
+## Architecture
+
+### Technology Stack
+
+- **Frontend**: React 19 + TypeScript + TailwindCSS v3
+- **Backend**: Express.js API server
+- **Desktop**: Tauri (Rust) — bootstraps and proxies the Node.js backend
+- **Build Tool**: Vite (for the renderer)
+- **File Watching**: Chokidar for real-time WAD directory synchronization
+- **State Management**: TanStack Query (React Query)
+- **UI Components**: Radix UI + shadcn/ui
+- **Routing**: wouter (path-only, no query param tracking)
+- **Icons**: Lucide React + Nerd Font (Atkinson Mono Nerd Font)
+
+### Application Structure
+
+```
+uaclaunchcontrol/
+├── client/            # React frontend
+│   └── src/
+│       ├── api.ts     # Fetch-based API client (localhost:7666)
+│       ├── App.tsx    # Root: router, auto-updater, modals
+│       ├── pages/     # GamesPage (/), InstallPage (/install), not-found
+│       ├── components/      # Custom components (CatalogManager, GameCard, etc.)
+│       │   └── ui/          # shadcn/ui primitives (40+ components)
+│       ├── hooks/           # useAutoUpdater, useToast, useMobile
+│       ├── lib/             # gameService, fileService, queryClient, utils
+│       ├── icons/           # DoomVersionIcon + PNG assets
+│       └── assets/          # Fonts, images, logos
+├── server/            # Express.js API backend
+│   ├── index.ts       # Server setup (port 7666), CORS, logging middleware
+│   ├── routes.ts      # All REST API endpoints
+│   ├── storage.ts     # JSON file-based persistence + WAD file watcher
+│   └── services/
+│       ├── fileService.ts  # File system operations
+│       └── gameService.ts  # Game config management
+├── src-tauri/         # Rust/Tauri desktop wrapper
+│   ├── src/
+│   │   ├── main.rs    # Bootstraps Node.js server, proxy, window management
+│   │   └── ...
+│   └── ...
+└── shared/            # Shared TypeScript types
+    └── schema.ts      # All interfaces: IMod, IModFile, IDoomVersion, etc.
+```
+
+### Data Flow
+
+1. **Tauri (Rust)** starts and spawns the Node.js Express API server on port `7666` as a background process.
+2. **Express Server** manages JSON file storage at `~/.config/uac/`:
+   - `settings.json` — App settings (paths, preferences)
+   - `doomVersions.json` — Configured Doom versions/WADs
+   - `modFileCatalogue.json` — Catalog of available mod files
+   - `mods/` — Individual mod configurations as JSON files
+3. **Chokidar** watches the WAD files directory for changes and syncs doom versions automatically.
+4. **Renderer** (React app) communicates with the API server via HTTP fetch.
+5. **Media Proxy**: Images served via both `/api/media?path=` and `/images/:fileName` to bypass Tauri's `tauri://` security restrictions.
+6. **Auto-Update**: Uses `electron-updater` (legacy) with GitHub releases. New Tauri-based builds use Tauri's built-in updater.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+- GZDoom (or similar source port) installed on your system
+
+```bash
+# Clone the repository
+git clone https://github.com/mikkelrask/uaclaunchcontrol.git
+cd uaclaunchcontrol
+
+# Install dependencies
+npm install
+```
+
+### Development
+
+```bash
+# Run in development mode (with hot reload)
+npm run dev
+```
+
+This will:
+- Start the Vite dev server for the renderer (with proxy to Express on port 7666)
+- Start the Tauri development environment
+- Start the Chokidar WAD watcher for real-time sync
+
+```bash
+# TypeScript type checking
+npm run typecheck
+
+# Lint and format
+npm run lint
+npm run format
+
+# Build for your current platform
+npm run build
+```
+
+### Platform-specific builds
+
+```bash
+npm run build:win    # Windows
+npm run build:mac    # macOS
+npm run build:linux  # Linux
+npm run build:unpack # Build + unpacked directory (for testing)
+```
+
+Built applications will be in the `dist/` directory.
+
+## Configuration
+
+Done via the application settings (cog icon in the top right corner), but everything is also stored in plain text JSON files, so you can edit them manually if you want to. All paths support tilde (`~`) expansion.
+
+### Storage Location
+
+All application data is stored in `~/.config/uac/`:
+
+```
+~/.config/uac/
+├── settings.json           # App settings (paths, preferences)
+├── doomVersions.json       # Configured Doom versions/WADs
+├── modFileCatalogue.json   # Catalog of available mod files
+├── mods/                   # Individual mod configurations
+│   ├── 1.json
+│   ├── 2.json
+│   └── ...
+├── images/                 # Screenshots and downloaded images
+└── saves/                  # Game save files (per-mod, optional)
+```
+
+### Default Settings
+
+```json
+{
+  "sourcePortPath": "",
+  "theme": "dark",
+  "savegamesPath": "~/.config/uac/saves",
+  "modsDirectory": "~/.config/uac/mods",
+  "screenshotsPath": "~/Pictures/UAC Launch Control/screenshots",
+  "wadFilesDirectory": "~/.config/uac/wads",
+  "autoUpdateEnabled": true,
+  "registryLookupEnabled": false
+}
+```
+
+## API Endpoints
+
+The Express server exposes the following REST API on `localhost:7666`:
+
+### Mods
+- `GET /api/mods` — List all mods (optional `?version=` and `?search=` query params)
+- `GET /api/mods/:id` — Get specific mod with its files
+- `POST /api/mods` — Create new mod
+- `PUT /api/mods/:id` — Update mod
+- `DELETE /api/mods/:id` — Delete mod
+- `POST /api/mods/:id/launch` — Launch a mod (spawns source port)
+
+### Doom Versions / WADs
+- `GET /api/versions` — List all Doom versions
+- `PUT /api/versions` — Save all Doom versions (full array replace)
+- `GET /api/versions/:slug` — Get Doom version by slug
+- `PUT /api/versions/:id` — Update a single Doom version
+- `POST /api/wads/import` — Import a .wad file with MD5-based renaming
+
+### Mod File Catalog
+- `GET /api/mod-files/catalog` — List catalog files
+- `POST /api/mod-files/catalog` — Add file to catalog
+- `PUT /api/mod-files/catalog/:id` — Update catalog entry
+- `DELETE /api/mod-files/catalog/:id` — Delete catalog entry
+- `POST /api/mod-files/hash` — Compute MD5 hash of a file
+- `POST /api/mod-files/move` — Move file to mod folder with hash-based naming
+
+### Settings
+- `GET /api/settings` — Get expanded application settings
+- `PUT /api/settings` — Update settings
+
+### Media & Files
+- `GET /api/media?path=` — Proxy for serving local files safely
+- `GET /images/:fileName` — Serve images from the images directory
+- `POST /api/screenshots/upload` — Upload/copy a screenshot to images dir
+- `POST /api/mod/download-image` — Download an image from a URL
+- `POST /api/move-file` — Move a file from one path to another
+- `POST /api/dialog/open` — Open native file/folder picker (supports tilde)
+
+### Migration
+- `GET /api/migration/check` — Check for legacy config from previous versions
+- `POST /api/migration/execute` — Execute legacy migration
+
+## Path Aliases
+
+Defined in `electron.vite.config.ts` (legacy) or Vite config:
+
+- `@/` — Maps to `client/src/` (e.g. `@/components/ui/button`)
+- `@shared/` — Maps to `shared/` (e.g. `@shared/schema`)
+
+## Styling
+
+- TailwindCSS v3 with class-based dark mode
+- Custom app utility classes: `bg-app-primary`, `bg-app-secondary`, `text-app-primary`, `text-app-muted`, `border-app`, `bg-accent-highlight`
+- Font: **Aldrich** (sans, bundled via `@font-face`), with Atkinson Mono Nerd Font as fallback for icon glyphs
+- UI components in `client/src/components/ui/` (40+ shadcn/ui primitives)
+
+## Dialog Pattern
+
+All dialogs follow a consistent pattern modeled on `SettingsDialog.tsx`:
+
+```tsx
+<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+  <DialogContent className="bg-app-primary shadow-2xl border-app max-w-4xl p-0 overflow-hidden flex flex-col">
+    {/* Full-bleed header bar */}
+    <div className="flex items-center justify-between p-4 border-b border-app bg-app-secondary">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-accent-highlight/10 rounded-md">
+          <Icon className="w-5 h-5 text-accent-highlight" />
+        </div>
+        <div>
+          <DialogTitle className="text-xl font-bold tracking-tight text-app-primary lowercase">
+            title_text
+          </DialogTitle>
+          <DialogDescription className="text-xs font-semibold font-mono text-app-muted uppercase tracking-widest opacity-80">
+            UAC Launch Control // Description
+          </DialogDescription>
+        </div>
+      </div>
+    </div>
+
+    {/* Body */}
+    <div className="flex-1 overflow-y-auto p-4">...</div>
+
+    {/* Full-bleed footer bar */}
+    <DialogFooter className="bg-app-secondary border-t border-app p-4 shrink-0">
+      <Button variant="outline" onClick={onClose}>Cancel</Button>
+      <Button className="bg-accent-highlight text-white">Confirm</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+## Keyboard Shortcuts
+
+Defined in `Header.tsx`. All single-letter shortcuts are lowercase and disabled when typing in an input/textarea:
+
+| Key | Action |
+|-----|--------|
+| `/` | Focus search input |
+| `i` | Go to Install > Configuration tab |
+| `m` | Go to Install > Mod Files tab |
+| `w` | Go to Install > WAD Files tab |
+| `l` | Go to Launch page |
+| `Ctrl+.` | Open Settings |
+| `?` | Show keyboard shortcuts modal |
+
+Global shortcuts use URL query params (`/install?tab=files`) + custom DOM events (`uac:switch-tab`) since wouter only tracks pathname.
+
+## Shared Types
+
+All interfaces in `shared/schema.ts` use `I` prefix:
+
+- **IMod** — Mod/game instance (title, description, files, source port, etc.)
+- **IModFile** — Individual mod file entry (path, hash, type, load order)
+- **IDoomVersion** — Base game/WAD configuration (name, slug, executable, icon)
+- **IAppSettings** — Application settings (paths, theme, toggles, database links)
+- **IUpdateInfo** — Auto-update status (version, release notes, download progress)
+- **IResponseMessage** — Generic API response wrapper
+
+## Development Notes
+
+### TypeScript Configuration
+
+The project uses separate TypeScript configurations:
+
+- `tsconfig.node.json` — Server code
+- `tsconfig.web.json` — Renderer process (includes `shared` via composite)
+
+### Code Style
+
+- TypeScript strict mode, files: `.ts` / `.tsx`
+- No semicolons, single quotes, 100 char print width, no trailing commas (Prettier)
+- PascalCase for components, camelCase for hooks (`use` prefix), kebab-case for files
+- PascalCase with `I` prefix for types (`IMod`, `IModFile`)
+- Use `cn()` from `@/lib/utils` for conditional class merging
+- Errors displayed via `useToast()` hook
+
+### State Management
+
+- **Server state**: TanStack Query (`useQuery`, `useMutation`) with `staleTime: Infinity`
+- **Local state**: `useState`
+- **Global UI**: React Context (rare)
+- **Query keys**: Use URL paths as keys: `['/api/mods']`, `['/api/mod-files/catalog']`, `['/api/settings']`
+
+## Recommended IDE Setup
+
+- [VSCode](https://code.visualstudio.com/)
+- Extensions:
+  - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+  - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+  - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)

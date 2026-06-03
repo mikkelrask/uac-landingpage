@@ -1,40 +1,68 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: "Launch Control"
+description: Launch, manage, and organize your Doom mods with military-grade precision.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: "Modded RIP & TEAR with your favorite source port on easy mode!"
   image:
-    file: ../../assets/houston.webp
+    alt: UAC Launch Control screenshot
+    html: "<img src='/screenshot-app.png' alt='UAC Launch Control screenshot' style='width: auto; max-width: 100%; height: auto;'>"
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get Started
+      link: /getting-started/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
+    - text: Download
+      link: /installation/
+      icon: download
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## Next steps
+## What is Launch Control?
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+**UAC Launch Control** is a cross-platform desktop application that lets you manage, configure, and launch modded Doom games with any source port — all from one clean interface. Think of it as mission control for your Doom mod collection.
+
+No more wrangling batch files, remembering command-line arguments, or manually tracking load orders. Just point the app at your source port, import your WADs and mods, and launch with a single click.
+
+Available for **Windows**, **macOS**, and **Linux**.
+
+---
+
+## What it does
+
+<CardGrid>
+  <Card title="Launch with one click" icon="rocket">
+    Set up game instances combining a base game (Doom, Doom II, Heretic, FreeDoom, etc.), a source port, and your mods — then launch everything with a single click.
+  </Card>
+  <Card title="Manage multiple source ports" icon="window">
+    Add several engine executables (GZDoom, UZDoom, Zandronum, etc.) and pick which one to use per game. Set a default, hide ones you don't need.
+  </Card>
+  <Card title="Keep a mod catalog" icon="seti:folder">
+    Build a searchable library of your mod files with names, versions, and URLs. Add files via drag-and-drop and set their load order visually.
+  </Card>
+  <Card title="Import your IWADs" icon="add-document">
+    Drop in your WAD files (doom2.wad, freedoom1.wad, heretic.wad, etc.) — the app auto-detects known ones and gives each a proper name and icon.
+  </Card>
+  <Card title="Community metadata" icon="server">
+    Opt into the UAC Registry to automatically fetch mod metadata from a community database — or contribute metadata anonymously when you add new files.
+  </Card>
+  <Card title="Switch up the look" icon="list-format">
+    Choose from four visual themes: dark industrial (UAC PHOBOS), bright (MAYKR), terminal green (PLUTONIA TERMINAL), or define your own HSL palette.
+  </Card>
 </CardGrid>
+
+## Quick Start
+
+1. **[Download UAC Launch Control](/installation/)** for your platform
+2. **Add a source port** like GZDoom in Settings → Paths
+3. **Import a base game WAD** — `doom2.wad`, `freedoom2.wad`, or any IWAD
+4. **Create a protocol** — pick your base game, source port, and mods, set the load order
+5. **Launch!**
+
+![UAC Launch Control Settings](../../assets/0.3.5.png)
+
+## Ready to dive in?
+
+Head over to **[Getting Started](/getting-started/)** for a full walk-through, or check the sidebar for guides on specific topics like [managing source ports](/guides/source-ports/), [adding mod files](/guides/mod-files/), and [importing WADs](/guides/base-game-wad/).
+
+> **Want to contribute or build from source?** See the **[For Developers](/developers/)** page for architecture docs, API endpoints, and build instructions.
