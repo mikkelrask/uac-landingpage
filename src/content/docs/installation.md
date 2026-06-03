@@ -12,10 +12,12 @@ Scroll down to **Assets** and find the Windows installer — ending with `.exe`.
 
 2. **When download has finished, double click the downloaded file, follow any on screen instructions and the installer will take care of the rest.**
 
-### Windows run warning
+#### Windows run warning
 
 **Please note** that you will get a warning about **"Windows prevented an application from running"** when running an unsigned `.exe` file on your system.  
+
 You will need to click **Run anyway** to be able to install the application.
+![Click 'More Info' followed by 'Run anyway'](/windows-defender.png)
 
 ---
 
@@ -26,16 +28,33 @@ Under **Assets** find the release ending with `.dmg`.
 
 2. When the download finishes, double click the `.dmg` file to mount the image.
 3. Drag-and-drop the **UAC Launch Control** app-icon to the **Applications** directory.
+![Drag and drop UAC Launch Control.App to Applications](/macos-drag-to-applications.png)
 
+#### _"UAC Launch Control Is Damaged and Can’t Be Opened. You Should Move It To The Trash"_
+This is Apple's way of saying ["this app is not from our App Store"](https://discussions.apple.com/thread/253714860?answerId=257037956022&sortBy=rank).
+
+If you experience this error when opening **UAC Launch Control**, you need to unquarantine it.  
+
+You can unquarantine it by:
+1. Open a **Terminal** window  
+`CMD+Space` and type `Terminal`, and hit **Enter**  
+2. Type or paste the following command before hitting **Enter** 
+```sh
+xattr -dr com.apple.quarantine "/Applications/UAC Launch Control.app"
+```
+3. Re-open UAC Launch Control.
+
+
+----
 A `zip` version is also available for macOS if you prefer.
 
 ---
 
 ## Linux
 
-On Linux you have different options, depending on your distro and what you want.
+On Linux you have different options, depending on your Linux distro and what you want.
 
-The **recommended way** is to use the `AppImage` from the **[Releases](https://github.com/mikkelrask/uaclaunchcontrol/releases)** page.
+The **recommended way** is to use the `AppImage` from the **[Releases](https://github.com/mikkelrask/uaclaunchcontrol/releases)** page, as this is a selfcontained and selfupdating file, that requires no installation.
 
 1. Scroll down to **Assets** and click the `.AppImage` version.  
 This is a complete standalone file which requires no installation and gets updates from within the application itself.
