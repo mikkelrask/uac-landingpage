@@ -245,7 +245,7 @@ blockquote {
 	width: auto !important;
 	height: auto !important;
 	max-width: min(90vw, 600px) !important;
-	max-height: 400px !important;
+	max-height: 600px !important;
 	object-fit: contain !important;
 	box-shadow: 0 4px 24px hsl(0 0% 0% / 0.5);
   border: 0!important;
@@ -261,7 +261,7 @@ blockquote {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.5em;
-	padding: 0.4375rem 1.125rem;
+	padding: 0.4rem 1rem;
 	background: hsl(0 84% 40%);
 	border: 1px solid hsl(0 84% 40%);
 	color: hsl(0 0% 100%);
