@@ -258,6 +258,10 @@ blockquote {
 }
 
 .hero .sl-link-button.primary {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.4375rem 1.125rem;
 	background: hsl(0 84% 40%);
 	border: 1px solid hsl(0 84% 40%);
 	color: hsl(0 0% 100%);
@@ -265,7 +269,9 @@ blockquote {
 	font-size: 0.9rem;
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-  border-radius: 0;
+	text-decoration: none;
+	line-height: 1.1875;
+	border-radius: 0;
 	transition:
 		background 150ms,
 		border-color 150ms;
@@ -274,6 +280,13 @@ blockquote {
 .hero .sl-link-button.primary:hover {
 	background: hsl(0 80% 50%);
 	border-color: hsl(0 80% 50%);
+}
+
+@media (min-width: 50rem) {
+	.hero .sl-link-button.primary {
+		font-size: var(--sl-text-base);
+		padding: 0.9375rem 1.25rem;
+	}
 }
 
 .hero .sl-link-button.minimal {
@@ -352,3 +365,5 @@ starlight-theme-select {
 button {
   border-radius: 0!important;
 }
+
+

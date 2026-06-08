@@ -7,6 +7,10 @@ export default defineConfig({
 	site: "https://uac-launch-control.pages.dev",
 	integrations: [
 		starlight({
+			components: {
+				Hero: "./src/components/custom/Hero.astro",
+				SocialIcons: "./src/components/custom/SocialIcons.astro",
+			},
 			title: "UAC SOFT",
 			description:
 				"Documentation for UAC Launch Control — a cross-platform modded Doom source port launcher.",
@@ -54,6 +58,7 @@ export default defineConfig({
 					],
 				},
 				{ label: "For Developers", slug: "developers" },
+				{ label: "Release Notes", slug: "release-notes" },
 			],
 		}),
 	],
