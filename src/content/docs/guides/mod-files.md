@@ -44,6 +44,35 @@ If you have **Registry Lookups** enabled in `core_settings` → **General**, the
 
 See the **[UAC Registry Lookup](/reference/uac-registry/)** page for full details.
 
+## Where to find mod files
+
+Looking for mods to play? Here are the best places to find Doom mods of all kinds:
+
+| Site | Best for |
+|------|----------|
+| **[ModDB](https://www.moddb.com/games/doom-ii/mods)** | The largest collection of Doom mods anywhere. Most major mods (Project Brutality, Hideous Destructor, Ashes 2063, etc.) have their main release here. |
+| **[Doomworld / idgames](https://www.doomworld.com/idgames/)** | The original Doom mod archive — 20,000+ files going back decades. Great for classic maps, weapon mods, and obscure gems. Can be browsed through the [Doomworld frontend](https://www.doomworld.com/idgames/) or directly via the [/idgames FTP](https://www.doomworld.com/idgames/). |
+| **[Realm667](https://www.realm667.com/)** | A curated repository of weapon, monster, and texture packs. Especially good if you're making your own mods and need resources. |
+| **[Doom Launcher Pack Hub](https://github.com/Doom-Launcher/Pack-Hub)** | Modpacks distributed as `.dlp` files — curated collections of mods bundled together for specific playthroughs. |
+| **[GitHub](https://github.com/topics/doom-mod)** | Many modern mods are developed on GitHub. Search topics like `doom-mod`, `gzdoom`, `doom-wad` to find projects. |
+
+### File formats to look for
+
+Most mod files come in one of these formats — UAC Launch Control supports all of them:
+
+| Format | Description |
+|--------|-------------|
+| `.wad` | Classic Doom format — can be an IWAD (full game) or a PWAD (mod patch). |
+| `.pk3` / `.pk7` | Zipped archive formats used by ZDoom-family ports. These are the most common format for modern mods. |
+| `.zip` | Supported natively by GZDoom/UZDoom — the app can also unpack it and let you import individual files. |
+| `.deh` / `.bex` | DeHackEd patches that modify game behavior (weapon stats, monster properties). |
+
+### Tips
+
+- **Read the mod page** — many mods specify which source port and version they require. Install that specific version (see the [Downloading Source Ports](/guides/downloading-source-ports/) guide).
+- **Load order matters** — when using multiple mods, the order they're loaded can affect compatibility. Check the mod description for recommended load orders and set them up in the **Load Order** field when adding files.
+- **Registry metadata** — if you have [UAC Registry Lookup](/reference/uac-registry/) enabled, the app will try to auto-fill names and versions when you add a file. The registry grows as the community contributes metadata.
+
 ## Storage
 
 Mod files registered in the catalog are stored in your configured **Mods Directory** (`~/.config/uac/mods/` by default). The catalog index itself lives at:

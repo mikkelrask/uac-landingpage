@@ -247,7 +247,7 @@ blockquote {
 	max-width: min(90vw, 600px) !important;
 	max-height: 600px !important;
 	object-fit: contain !important;
-	box-shadow: 0 4px 24px hsl(0 0% 0% / 0.5);
+	box-shadow: 1 4px 24px hsl(0 0% 0% / 0.5);
   border: 0!important;
   border-radius: 0!important;
 }
