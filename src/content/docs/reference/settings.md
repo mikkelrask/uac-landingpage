@@ -20,7 +20,7 @@ To open **Settings**, click the **cog icon** in the top navigation bar.
 ### TECHNICAL SPECIFICATIONS
 
 - **Auto-update** — automatically check for application updates on startup (default: on).
-- **Registry Lookup** — enable mod file lookups in the online UAC Registry when adding files to your catalog (available from vE1M0.3.0+).
+- **Registry Lookup** — when enabled, the system queries the online UAC Registry for mod file metadata when adding files to your catalog.
 - **Manual update check** — check for updates on demand.
 - **Config Path** — read-only display of where `settings.json` is stored on disk.
 
@@ -39,17 +39,16 @@ Configure directories for **Source Ports**, **Wads**, **Mods**, **Saves** and **
 
 ### Source Ports
 
-As of **vE1M0.3.1**, the **Source Ports** section (under **CORE INFRASTRUCTURE**) lets you manage multiple source port executables.
+The **Source Ports** section (under **CORE INFRASTRUCTURE**) lets you manage multiple source port executables.
 
 - Click **+ Add Port** to open a file picker and select an executable.
+- Click **Scan Path** to automatically detect supported source ports installed on your system.
 - Use the inline form to set **name**, **version**, **executable path**, and **family**.
 - Click the **radio dot** on the left to set a port as the **default**.
 - Use the **eye icon** to hide a port from game instance selectors without deleting it.
 - Use the **pencil** (edit) and **trash** (delete) icons to manage ports.
 
 See the **[Manage source ports](/guides/source-ports/)** page for full details.
-
-> **Upgrading from an earlier version?** Your old single source port path is **automatically migrated** on first launch.
 
 ---
 
@@ -85,4 +84,4 @@ The application auto-detects these WADs: `doom.wad`, `doomu.wad`, `doom2.wad`, `
 - **Hide from Interface** — excludes the WAD from the sidebar and base game selectors (useful for auxiliary files like `voices.wad`).
 - **File Source** — the actual file path on disk (read-only).
 
-> **Note:** The per-WAD engine/executable setting was removed in **vE1M0.3.1**. Source ports are now managed globally via the **Paths tab** — you assign a source port per game instance, not per WAD. See [Manage source ports](/guides/source-ports/).
+> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per game instance, not per WAD. See [Manage source ports](/guides/source-ports/).

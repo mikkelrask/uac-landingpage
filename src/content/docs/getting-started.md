@@ -5,21 +5,19 @@ description: A brief walk-through on getting started with UAC Launch Control.
 
 A brief walk-through on getting started with UAC Launch Control.
 
-## 1. Download and install
+## 1. Download, install and launch
 
-Follow the steps in the **[Installation guide](/installation/)**.
+Follow the steps in the **[Installation guide](/installation/)**. On first launch, the **Soldier Training** guided tour walks you through setting up source ports and creating your first game instance. Existing users can skip it.
 
 ## 2. Configure source ports
 
-**vE1M0.3.1** supports multiple source ports — you can add different engines (GZDoom, UZDoom, Zandronum, etc.) and pick which one to use per game instance.
+Supports multiple source ports — you can add different engines (GZDoom, UZDoom, Zandronum, Helion, etc.) and pick which one to use per game instance.
 
 - Click the **cog icon** → **Paths** tab → **Source Ports** section.
-- Click **+ Add Port** to browse for an executable, give it a name, and pick its family.
-- Set a **default port** (used when no specific port is assigned to an instance).
+- Click **Scan Path** to auto-detect installed source ports, or click **+ Add Port** to browse for an executable manually.
+- Give each port a name, set its family, and mark a **default**.
 
 See the **[Manage source ports](/guides/source-ports/)** page for full details.
-
-> **Upgrading from an earlier version?** Your old single source port path is **automatically migrated** on first launch.
 
 You can also set directories for **WADs**, **Mods**, **Saves** and **Screenshots** on the same tab — see **[Settings → Paths tab](/reference/settings/#paths-tab)**.
 

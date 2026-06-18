@@ -18,7 +18,9 @@ Navigate to the **Install** page and switch to the **Mod Files** tab. This is yo
    - Optionally add a **Version** (e.g. `2.0b`)
    - Optionally add a **URL** linking to the mod's ModDB page, forum thread, or source
    - **Load Order** lets you specify other mod files this one depends on. The system will automatically load dependencies before this mod when launching. You can reorder dependencies by dragging them, or remove them with the trash icon.
+   - If importing a `.zip` file that contains multiple supported files, the system will detect them and let you set their relative load order right from the import popup.
    - Toggle **Sidecar mod** if this file doesn't work on its own and is only meant to be loaded alongside another mod.
+   - **Settings File** — if the mod comes with a suggested `settings.cfg`, you can link it here. A copy will be created for each protocol using this mod.
 3. Click **Add to Catalog**. The system will copy the file to your mods directory with an MD5 hash-based filename to prevent collisions, and register it in the catalog.
 
 The file is now available in the catalog and can be assigned to any **Launch Protocol** via the **Mod File Selector** dropdown on the Install page.
@@ -38,7 +40,7 @@ Back in the **Mod Files** tab:
 - Click the **pencil icon** (`✏️`) on any row to edit the entry's name, version, URL, or load order.
 - Click the **trash icon** (`🗑️`) to remove a file from the catalog entirely. This does **not** delete the actual file from disk — only removes it from the system registry.
 
-### UAC Registry Lookup (E1M0.3.0+)
+### UAC Registry Lookup
 
 If you have **Registry Lookups** enabled in `core_settings` → **General**, the system will attempt to match your mod file against the online **UAC Registry** when adding it to the catalog. Matched files will auto-populate metadata like name and version. Registry lookups require an active connection to the UAC data centers.
 

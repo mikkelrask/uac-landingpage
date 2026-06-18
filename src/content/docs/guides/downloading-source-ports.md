@@ -9,6 +9,21 @@ This guide covers where to find them and how to grab a **specific version** (not
 
 ---
 
+## Helion
+
+**[Helion](https://helion.sourceforge.net/)** is a modern source port built from the ground up in C#. It features a Vulkan renderer and performs well even on modest hardware, with experimental mod compatibility.
+
+### Latest release
+
+Grab it from the [Helion releases page on GitHub](https://github.com/Helion-Engine-Helion/Helion/releases).
+
+| Platform | Package |
+|----------|---------|
+| **Windows** | `Helion-win-x64.zip` |
+| **Linux** | `Helion-linux-x64.tar.gz` |
+
+---
+
 ## UZDoom
 
 UZDoom is the most modern and actively developed source port. It's a fork of GZDoom that adds **Vulkan** rendering and experimental features, and follows its own rapid release cycle.

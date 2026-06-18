@@ -3,7 +3,7 @@ title: Manage Source Ports
 description: Configure multiple source port executables in UAC Launch Control.
 ---
 
-As of **vE1M0.3.1**, you can configure multiple source ports (different engines or different versions of the same engine) and pick which one to use per game instance.
+You can configure multiple source ports (different engines or different versions of the same engine) and pick which one to use per game instance.
 
 ![Source Port Settings](/source-port-settings.png)
 
@@ -11,7 +11,11 @@ As of **vE1M0.3.1**, you can configure multiple source ports (different engines 
 
 Click the **cog icon** (`⚙️`) in the top navigation → **core_settings** → **Paths** tab. The **Source Ports** section is at the top under **CORE INFRASTRUCTURE**.
 
-## Adding a source port
+## Scanning for source ports
+
+Rather than hunting for executables yourself, click **Scan Path** and the system will check known install locations on your system for gzdoom, uzdoom, zdoom, zandronum, and helion. Found ports are added automatically with their family set — just review and save.
+
+## Adding a source port manually
 
 1. Click **+ Add Port**.
 2. A file picker opens — select your source port executable (binary, AppImage, or .exe).
@@ -43,10 +47,6 @@ Click the **eye icon** to toggle visibility in game instance selectors. Hidden p
 
 When installing or editing a game instance, the **Source Port** field is a filterable combobox showing only non-ignored ports (name, family badge, version). No free-text entry — you must pick from the list.
 
-## Migration from vE1M0.3.0 and earlier
-
-On first launch after updating, the old single `sourcePortPath` is automatically converted into a port entry named `"Default (migrated)"` with family auto-detected and set as default. Old mod files using the legacy `sourcePort` string are backfilled to `sourcePortId`. Your original path is preserved throughout.
-
 ## Fallback chain
 
 When launching a game, the executable is resolved in this order:
@@ -63,4 +63,4 @@ When launching a game, the executable is resolved in this order:
 | "No source ports configured" on launch | No ports in the list | Add at least one source port in Settings → Paths |
 | Game launches with the wrong engine | Game instance has a different port selected | Edit the instance and check the Source Port selector |
 | Combobox is empty | All ports hidden or none configured | Check eye icons in Settings → Paths |
-| Can't find old port after updating | Migration only runs once | Look for a port named "Default (migrated)" in Settings → Paths |
+
