@@ -1,342 +1,229 @@
 ---
-// ReleaseNotes — fetches releases at build time via the GitHub API
-// and renders them as static HTML with proper heading IDs.
-// A small client script injects version links into Starlight's TOC sidebar.
-
-interface GitHubRelease {
-  tag_name: string;
-  name: string;
-  published_at: string;
-  html_url: string;
-  body: string | null;
-  prerelease: boolean;
-}
-
-const OWNER = "mikkelrask";
-const REPO = "uaclaunchcontrol";
-
-let releases: GitHubRelease[] = [];
-let fetchError = "";
-
-try {
-  // Fetch up to 5 pages of releases (max 100)
-  const allReleases: GitHubRelease[] = [];
-  for (let page = 1; page <= 5; page++) {
-    const url = `https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=20&page=${page}`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.github.v3+json" },
-    });
-    if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
-    const data: GitHubRelease[] = await res.json();
-    if (!Array.isArray(data) || data.length === 0) break;
-    allReleases.push(...data);
-    if (data.length < 20) break;
-  }
-  releases = allReleases;
-} catch (e) {
-  fetchError = e instanceof Error ? e.message : String(e);
-}
-
-/** Crude-but-safe markdown → HTML for release bodies. */
-function renderMarkdown(md: string | null): string {
-  if (!md) return "";
-
-  // 1. Protect raw HTML <img> tags so their URLs don't get mangled later
-  const rawImgs: string[] = [];
-  let html = md.replace(/<img[^>]*>/gi, (m) => {
-    const idx = rawImgs.length;
-    rawImgs.push(m);
-    return `\x00RAWIMG${idx}\x00`;
-  });
-
-  // 2. Escape HTML entities in remaining text
-  html = html
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  // 3. Inline formatting (applied per-line later, defined here as a helper)
-  function inline(text: string): string {
-    // 1. Protect image markup with placeholders so bare-URL / link
-    //    processing doesn't mangle the URL inside <img src="...">
-    const imgs: string[] = [];
-    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
-      const idx = imgs.length;
-      imgs.push(`<img src="${url}" alt="${alt}" loading="lazy" />`);
-      return `\x00IMG${idx}\x00`;
-    });
-
-    // 2. Links [text](url)
-    text = text.replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
-    );
-
-    // 3. Bare URLs (autolink) — \x00 prevents matching inside placeholders
-    text = text.replace(
-      /(https?:\/\/[^\s<"'\x00]+)/g,
-      '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
-    );
-
-    // 4. Bold **text**
-    text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    // 5. Italic *text*
-    text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
-    // 6. Italic _text_
-    text = text.replace(/_([^_]+)_/g, "<em>$1</em>");
-    // 7. Strikethrough ~~text~~
-    text = text.replace(/~~([^~]+)~~/g, "<del>$1</del>");
-    // 8. Inline code `text`
-    text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-    // 9. Restore images
-    text = text.replace(/\x00IMG(\d+)\x00/g, (_, d) => imgs[parseInt(d)]);
-
-    return text;
-  }
-
-  // 3. Line-by-line block processing
-  const lines = html.split("\n");
-  const out: string[] = [];
-  let listTag = ""; // "ul", "ol", "task" or "" when not in a list
-  let inCodeBlock = false;
-
-  function closeList() {
-    if (listTag) {
-      out.push(listTag === "task" ? "</ul>" : `</${listTag}>`);
-      listTag = "";
-    }
-  }
-
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-
-    // ── Code blocks ────────────────────────────────
-    if (/^```/.test(line)) {
-      closeList();
-      if (inCodeBlock) {
-        out.push("</code></pre>");
-        inCodeBlock = false;
-      } else {
-        out.push("<pre><code>");
-        inCodeBlock = true;
-      }
-      continue;
-    }
-    if (inCodeBlock) {
-      out.push(line + "\n");
-      continue;
-    }
-
-    // Apply inline formatting
-    line = inline(line);
-
-    // ── Blank line → close any open list ───────────
-    if (/^\s*$/.test(line)) {
-      closeList();
-      out.push("");
-      continue;
-    }
-
-    // ── Headings ───────────────────────────────────
-    const hMatch = line.match(/^(#{1,4})\s+(.+)/);
-    if (hMatch) {
-      closeList();
-      const level = hMatch[1].length;
-      // Shift up by 1 so `##` → `<h3>`, `###` → `<h4>` (below the release-title `<h2>`)
-      const tagLevel = Math.min(level + 1, 6);
-      out.push(`<h${tagLevel}>${hMatch[2]}</h${tagLevel}>`);
-      continue;
-    }
-
-    // ── Horizontal rule ────────────────────────────
-    if (/^---+$/.test(line)) {
-      closeList();
-      out.push("<hr />");
-      continue;
-    }
-
-    // ── Task list items ────────────────────────────
-    const taskMatch = line.match(/^[-*]\s+\[([ xX])\]\s+(.+)/);
-    if (taskMatch) {
-      const checked = taskMatch[1] !== " ";
-      if (listTag !== "task") {
-        closeList();
-        listTag = "task";
-        out.push('<ul class="contains-task-list">');
-      }
-      out.push(
-        `<li class="task-list-item${checked ? " checked" : ""}">` +
-        `<input type="checkbox"${checked ? " checked" : ""} disabled />` +
-        `${taskMatch[2]}</li>`
-      );
-      continue;
-    }
-
-    // ── Unordered list items ───────────────────────
-    const ulMatch = line.match(/^[-*]\s+(.+)/);
-    if (ulMatch) {
-      if (listTag !== "ul") {
-        closeList();
-        listTag = "ul";
-        out.push("<ul>");
-      }
-      out.push(`<li>${ulMatch[1]}</li>`);
-      continue;
-    }
-
-    // ── Ordered list items ─────────────────────────
-    const olMatch = line.match(/^\d+\.\s+(.+)/);
-    if (olMatch) {
-      if (listTag !== "ol") {
-        closeList();
-        listTag = "ol";
-        out.push("<ol>");
-      }
-      out.push(`<li>${olMatch[1]}</li>`);
-      continue;
-    }
-
-    // ── Regular paragraph text ─────────────────────
-    closeList();
-    out.push(line);
-  }
-
-  closeList();
-  if (inCodeBlock) out.push("</code></pre>");
-
-  // 4. Restore raw HTML <img> tags (they survived through inline processing
-  //    as \x00 placeholders since none of the regexes matched them)
-  let result = out.join("\n");
-  result = result.replace(/\x00RAWIMG(\d+)\x00/g, (_, d) => rawImgs[parseInt(d)]);
-
-  // 5. Assemble paragraphs
-
-  // Split on blank lines to form <p> blocks
-  // But preserve lists, headings, hr, pre as standalone blocks
-  const blocks = result.split(/\n{2,}/).filter((b) => b.trim());
-  const wrapped = blocks.map((block) => {
-    const trimmed = block.trim();
-    if (
-      /^<(ul|ol|h[1-6]|hr|pre|li)/i.test(trimmed) ||
-      /^<\/(ul|ol)/i.test(trimmed)
-    ) {
-      return trimmed;
-    }
-    // If it already starts with <p>, leave it
-    if (/^<p>/i.test(trimmed)) return trimmed;
-    return `<p>${trimmed}</p>`;
-  });
-
-  result = wrapped.join("\n");
-
-  // 6. Clean up — remove <p> wrapping inside list items
-  result = result.replace(/<li><p>/g, "<li>");
-  result = result.replace(/<\/p><\/li>/g, "</li>");
-
-  // Single <br> left over from blank-line splits becomes a space
-  result = result.replace(/<br \/>\s*<br \/>/g, "<br />");
-
-  return result;
-}
-
-/** Create a slug-safe heading ID from a tag like "v0.3.5" → "release-v0-3-5" */
-function slugTag(tag: string): string {
-  return "release-" + tag.replace(/[^a-zA-Z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
+// ReleaseNotes — fetches releases from the GitHub API client-side
+// and renders them as HTML. No build-time bake-in needed.
+// Replaces the old build-time-only version.
 ---
 
-<!-- Error state (build-time) -->
-{
-  fetchError && (
-    <div class="rn-error">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      <span>Could not load release notes from GitHub. <em>{fetchError}</em></span>
-    </div>
-  )
-}
-
-<!-- Release list (build-time rendered) -->
-{
-  !fetchError && releases.length === 0 && (
-    <p style="color: var(--sl-color-gray-3)">No releases found.</p>
-  )
-}
-
-{
-  !fetchError && releases.length > 0 && (
-    <ul id="rn-list" class="rn-list">
-      {releases.map((r, i) => {
-        const slug = slugTag(r.tag_name);
-        const isLatest = i === 0;
-        return (
-          <li class:list={["rn-release", { "rn-release--latest": isLatest }]}>
-            <!-- Badge -->
-            {
-              (isLatest || r.prerelease) && (
-                <span class:list={["rn-badge", { "rn-badge--pre": r.prerelease }]}>
-                  {r.prerelease ? "Pre-release" : "Latest"}
-                </span>
-              )
-            }
-
-            <!-- Tag + date row -->
-            <div class="rn-tag-row">
-              <a href={r.html_url} target="_blank" rel="noopener noreferrer" class="rn-tag">
-                {r.tag_name}
-              </a>
-              <span class="rn-date">{formatDate(r.published_at)}</span>
-            </div>
-
-            <!-- Title (this becomes the TOC heading) -->
-            <h2 id={slug} class="rn-title">{r.name || r.tag_name}</h2>
-
-            <!-- Body -->
-            <div class="rn-body" set:html={renderMarkdown(r.body)} />
-          </li>
-        );
-      })}
-    </ul>
-  )
-}
+<div id="rn-root">
+  <div id="rn-loading">
+    <p style="color: var(--sl-color-gray-3); font-style: italic;">Loading release notes…</p>
+  </div>
+  <div id="rn-error" class="rn-error hidden">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span>Could not load release notes from GitHub. <em id="rn-error-msg"></em></span>
+  </div>
+  <ul id="rn-list" class="rn-list hidden"></ul>
+</div>
 
 <script>
-// ── Inject version headings into Starlight's TOC sidebar ──
 (function () {
-  const toc = document.querySelector("starlight-toc");
-  const list = toc?.querySelector(":scope > nav > ul");
-  if (!list) return;
+  const OWNER = "mikkelrask";
+  const REPO = "uaclaunchcontrol";
 
-  const headings = document.querySelectorAll("#rn-list .rn-title[id]");
-  if (!headings.length) return;
+  const root = document.getElementById("rn-root");
+  const loading = document.getElementById("rn-loading");
+  const errorEl = document.getElementById("rn-error");
+  const errorMsg = document.getElementById("rn-error-msg");
+  const listEl = document.getElementById("rn-list");
 
-  // Get the "On this page" title node to insert after
-  headings.forEach((h) => {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = "#" + h.id;
-    const span = document.createElement("span");
-    span.textContent = h.textContent;
-    a.appendChild(span);
-    li.appendChild(a);
-    list.appendChild(li);
-  });
+  // ── Helpers ──────────────────────────────────────────
+
+  function slugTag(tag) {
+    return "release-" + tag.replace(/[^a-zA-Z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString("en-US", {
+      year: "numeric", month: "long", day: "numeric",
+    });
+  }
+
+  // ── Markdown renderer ────────────────────────────────
+
+  function renderMarkdown(md) {
+    if (!md) return "";
+
+    const rawImgs = [];
+    let html = md.replace(/<img[^>]*>/gi, (m) => {
+      const idx = rawImgs.length;
+      rawImgs.push(m);
+      return `\x00RAWIMG${idx}\x00`;
+    });
+
+    html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    function inline(text) {
+      const imgs = [];
+      text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) => {
+        const idx = imgs.length;
+        imgs.push(`<img src="${url}" alt="${alt}" loading="lazy" />`);
+        return `\x00IMG${idx}\x00`;
+      });
+      text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      text = text.replace(/(https?:\/\/[^\s<"'\x00]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+      text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      text = text.replace(/_([^_]+)_/g, "<em>$1</em>");
+      text = text.replace(/~~([^~]+)~~/g, "<del>$1</del>");
+      text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
+      text = text.replace(/\x00IMG(\d+)\x00/g, (_, d) => imgs[parseInt(d)]);
+      return text;
+    }
+
+    const lines = html.split("\n");
+    const out = [];
+    let listTag = "";
+    let inCodeBlock = false;
+
+    function closeList() {
+      if (listTag) {
+        out.push(listTag === "task" ? "</ul>" : `</${listTag}>`);
+        listTag = "";
+      }
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      if (/^```/.test(line)) {
+        closeList();
+        if (inCodeBlock) { out.push("</code></pre>"); inCodeBlock = false; }
+        else { out.push("<pre><code>"); inCodeBlock = true; }
+        continue;
+      }
+      if (inCodeBlock) { out.push(line + "\n"); continue; }
+      line = inline(line);
+      if (/^\s*$/.test(line)) { closeList(); out.push(""); continue; }
+      const hMatch = line.match(/^(#{1,4})\s+(.+)/);
+      if (hMatch) {
+        closeList();
+        const level = Math.min(hMatch[1].length + 1, 6);
+        out.push(`<h${level}>${hMatch[2]}</h${level}>`);
+        continue;
+      }
+      if (/^---+$/.test(line)) { closeList(); out.push("<hr />"); continue; }
+      const taskMatch = line.match(/^[-*]\s+\[([ xX])\]\s+(.+)/);
+      if (taskMatch) {
+        const checked = taskMatch[1] !== " ";
+        if (listTag !== "task") { closeList(); listTag = "task"; out.push('<ul class="contains-task-list">'); }
+        out.push(`<li class="task-list-item${checked ? " checked" : ""}"><input type="checkbox"${checked ? " checked" : ""} disabled />${taskMatch[2]}</li>`);
+        continue;
+      }
+      const ulMatch = line.match(/^[-*]\s+(.+)/);
+      if (ulMatch) {
+        if (listTag !== "ul") { closeList(); listTag = "ul"; out.push("<ul>"); }
+        out.push(`<li>${ulMatch[1]}</li>`);
+        continue;
+      }
+      const olMatch = line.match(/^\d+\.\s+(.+)/);
+      if (olMatch) {
+        if (listTag !== "ol") { closeList(); listTag = "ol"; out.push("<ol>"); }
+        out.push(`<li>${olMatch[1]}</li>`);
+        continue;
+      }
+      closeList();
+      out.push(line);
+    }
+    closeList();
+    if (inCodeBlock) out.push("</code></pre>");
+    let result = out.join("\n");
+    result = result.replace(/\x00RAWIMG(\d+)\x00/g, (_, d) => rawImgs[parseInt(d)]);
+    const blocks = result.split(/\n{2,}/).filter((b) => b.trim());
+    const wrapped = blocks.map((block) => {
+      const trimmed = block.trim();
+      if (/^<(ul|ol|h[1-6]|hr|pre|li)/i.test(trimmed) || /^<\/(ul|ol)/i.test(trimmed)) return trimmed;
+      if (/^<p>/i.test(trimmed)) return trimmed;
+      return `<p>${trimmed}</p>`;
+    });
+    result = wrapped.join("\n");
+    result = result.replace(/<li><p>/g, "<li>");
+    result = result.replace(/<\/p><\/li>/g, "</li>");
+    result = result.replace(/<br \/>\s*<br \/>/g, "<br />");
+    return result;
+  }
+
+  // ── Fetch + render ───────────────────────────────────
+
+  async function load() {
+    try {
+      const allReleases = [];
+      for (let page = 1; page <= 5; page++) {
+        const url = `https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=20&page=${page}`;
+        const res = await fetch(url, { headers: { Accept: "application/vnd.github.v3+json" } });
+        if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) break;
+        allReleases.push(...data);
+        if (data.length < 20) break;
+      }
+      releaseNotes(allReleases);
+    } catch (e) {
+      loading.classList.add("hidden");
+      errorMsg.textContent = e.message;
+      errorEl.classList.remove("hidden");
+    }
+  }
+
+  function releaseNotes(releases) {
+    loading.classList.add("hidden");
+
+    if (releases.length === 0) {
+      listEl.innerHTML = '<p style="color: var(--sl-color-gray-3)">No releases found.</p>';
+      listEl.classList.remove("hidden");
+      return;
+    }
+
+    let html = "";
+    for (let i = 0; i < releases.length; i++) {
+      const r = releases[i];
+      const slug = slugTag(r.tag_name);
+      const isLatest = i === 0;
+      html += `<li class="rn-release${isLatest ? " rn-release--latest" : ""}">`;
+      if (isLatest || r.prerelease) {
+        html += `<span class="rn-badge${r.prerelease ? " rn-badge--pre" : ""}">${r.prerelease ? "Pre-release" : "Latest"}</span>`;
+      }
+      html += `<div class="rn-tag-row"><a href="${r.html_url}" target="_blank" rel="noopener noreferrer" class="rn-tag">${escapeHtml(r.tag_name)}</a>`;
+      html += `<span class="rn-date">${formatDate(r.published_at)}</span></div>`;
+      html += `<h2 id="${slug}" class="rn-title">${escapeHtml(r.name || r.tag_name)}</h2>`;
+      html += `<div class="rn-body">${renderMarkdown(r.body)}</div></li>`;
+    }
+    listEl.innerHTML = html;
+    listEl.classList.remove("hidden");
+
+    // Inject TOC entries
+    const toc = document.querySelector("starlight-toc");
+    const tocList = toc?.querySelector(":scope > nav > ul");
+    if (tocList) {
+      document.querySelectorAll("#rn-list .rn-title[id]").forEach((h) => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#" + h.id;
+        const span = document.createElement("span");
+        span.textContent = h.textContent;
+        a.appendChild(span);
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    }
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  load();
 })();
 </script>
 
 <style>
-  /* ── error ─────────────────────────────────────── */
+  /* ── loading ────────────────────────────────────── */
+  .hidden { display: none; }
+
+  /* ── error ──────────────────────────────────────── */
   .rn-error {
     display: flex;
     align-items: center;
@@ -347,10 +234,7 @@ function formatDate(iso: string): string {
     color: var(--sl-color-gray-2);
     font-size: var(--sl-text-sm);
   }
-  .rn-error svg {
-    flex-shrink: 0;
-    color: hsl(0 84% 60%);
-  }
+  .rn-error svg { flex-shrink: 0; color: hsl(0 84% 60%); }
 
   /* ── release list ──────────────────────────────── */
   .rn-list {
@@ -369,12 +253,8 @@ function formatDate(iso: string): string {
     position: relative;
     transition: border-color 200ms;
   }
-  .rn-release:hover {
-    border-color: var(--sl-color-gray-4);
-  }
-  .rn-release--latest {
-    border-color: hsl(0 84% 60% / 0.35);
-  }
+  .rn-release:hover { border-color: var(--sl-color-gray-4); }
+  .rn-release--latest { border-color: hsl(0 84% 60% / 0.35); }
   .rn-release--latest::before {
     content: "";
     position: absolute;
@@ -383,7 +263,6 @@ function formatDate(iso: string): string {
     pointer-events: none;
   }
 
-  /* badge */
   .rn-badge {
     display: inline-block;
     font-size: 0.65rem;
@@ -402,7 +281,6 @@ function formatDate(iso: string): string {
     border-color: hsl(40 100% 50% / 0.25);
   }
 
-  /* tag + date row */
   .rn-tag-row {
     display: flex;
     align-items: baseline;
@@ -428,7 +306,6 @@ function formatDate(iso: string): string {
     font-family: var(--sl-font-mono);
   }
 
-  /* title (TOC heading) */
   .rn-title {
     font-family: "Aldrich", sans-serif;
     font-size: var(--sl-text-h5);
@@ -437,7 +314,6 @@ function formatDate(iso: string): string {
     letter-spacing: 0.02em;
   }
 
-  /* body (rendered markdown) */
   .rn-body {
     font-size: var(--sl-text-sm);
     line-height: 1.7;
@@ -446,8 +322,7 @@ function formatDate(iso: string): string {
   }
   .rn-body p { margin: 0 0 0.75rem 0; }
   .rn-body p:last-child { margin-bottom: 0; }
-  .rn-body h3,
-  .rn-body h4 {
+  .rn-body h3, .rn-body h4 {
     font-family: "Aldrich", sans-serif;
     color: var(--sl-color-white);
     margin: 1.25rem 0 0.5rem 0;
@@ -471,17 +346,9 @@ function formatDate(iso: string): string {
     border: 1px solid var(--sl-color-hairline);
     box-shadow: var(--sl-shadow-md);
   }
-  .rn-body a {
-    color: hsl(0 84% 60%);
-    text-decoration: underline;
-    transition: color 150ms;
-  }
+  .rn-body a { color: hsl(0 84% 60%); text-decoration: underline; transition: color 150ms; }
   .rn-body a:hover { color: hsl(0 80% 70%); }
-  .rn-body hr {
-    border: none;
-    border-top: 1px solid var(--sl-color-hairline);
-    margin: 1.5rem 0;
-  }
+  .rn-body hr { border: none; border-top: 1px solid var(--sl-color-hairline); margin: 1.5rem 0; }
   .rn-body blockquote {
     border-left: 3px solid hsl(0 84% 60% / 0.5);
     background: hsl(0 84% 60% / 0.04);
