@@ -45,12 +45,19 @@ Once enabled, the lookup runs automatically each time you add a file to the cata
 - Submissions are **only sent when you provide a URL** — if you never fill in a URL field, no data is ever submitted.
 - If you prefer to keep your mod catalog completely local, simply leave the feature disabled.
 
+## Searching the Registry
+
+From the **Launch view**, the search bar now queries not only your local game instances and mod catalogue, but also the **UAC Registry** — letting you discover mods by name without leaving the app.
+
+Results appear in a dedicated **UAC Registry** section showing family name, version, category, and download links. Click a link to open the mod's ModDB, GitHub, or forum page.
+
 ## Technical
 
-The Registry API lives at `https://db.uac-soft.online`. It exposes two endpoints:
+The Registry API lives at `https://db.uac-soft.online`. It exposes these endpoints:
 
 - `GET /mod/:hash` — Look up a mod by its MD5 hash. Returns metadata if found.
 - `POST /mod/pending` — Submit a mod to the pending review queue.
+- `GET /api/mods?q=...` — Search the registry by name.
 
 Lookups are performed asynchronously and do not block the catalog workflow — if the Registry is unreachable, the file is added locally without metadata, and no error is shown.
 

@@ -51,3 +51,5 @@ Click **Create protocol** when done. A notification confirms the game instance h
 
 - On the **Launch** view, hover a game instance to see its description and reveal **Launch** and **Adjust** buttons.
 - Click **Launch** to start.
+- **Search** the bar at the top to filter your game instances, catalogue mod files, and discover mods in the online **UAC Registry** — all in one place.
+- **Sort** the grid by **Last Played**, **Playtime**, **Creation date**, or **A–Z** using the dropdown in the top right.

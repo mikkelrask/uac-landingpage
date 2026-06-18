@@ -17,6 +17,7 @@ Navigate to the **Install** page and switch to the **Mod Files** tab. This is yo
    - Give it a **Pretty Name** — this is how the mod will be referred to throughout the system. If your file is called `Project_Brutality_2.0b.pk3`, you might name it `Project Brutality Phase 2`.
    - Optionally add a **Version** (e.g. `2.0b`)
    - Optionally add a **URL** linking to the mod's ModDB page, forum thread, or source
+   - Optionally pick a **Category** (e.g. `weapon_mod`, `map_pack`) to help organise your catalog.
    - **Load Order** lets you specify other mod files this one depends on. The system will automatically load dependencies before this mod when launching. You can reorder dependencies by dragging them, or remove them with the trash icon.
    - If importing a `.zip` file that contains multiple supported files, the system will detect them and let you set their relative load order right from the import popup.
    - Toggle **Sidecar mod** if this file doesn't work on its own and is only meant to be loaded alongside another mod.
@@ -37,8 +38,8 @@ On the **Configuration** tab of the Install page, you can also add files on-the-
 
 Back in the **Mod Files** tab:
 
-- Click the **pencil icon** (`✏️`) on any row to edit the entry's name, version, URL, or load order.
-- Click the **trash icon** (`🗑️`) to remove a file from the catalog entirely. This does **not** delete the actual file from disk — only removes it from the system registry.
+- Click the **pencil icon** (`✏️`) on any row to edit the entry's name, version, URL, category, or load order.
+- Click the **trash icon** (`🗑️`) to remove a file from the catalog entirely. A confirmation dialog lets you choose whether to also **delete the file from disk**.
 
 ### UAC Registry Lookup
 
