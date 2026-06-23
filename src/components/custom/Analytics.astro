@@ -1,0 +1,22 @@
+---
+// Ackee Tracker analytics — page views + download events.
+// Loaded on every page via the Footer override.
+---
+
+<script>
+import * as ackeeTracker from "ackee-tracker";
+
+const SERVER = "https://analytics.porgy-ruler.ts.net";
+const DOMAIN_ID = "7cc9da2c-7b0b-4e2b-9175-7b7421758a45";
+const EVENT_ID = "fb089403-c89c-48db-b61a-fdf20d10c115";
+
+const instance = ackeeTracker.create(SERVER);
+
+// Track the page view
+instance.record(DOMAIN_ID);
+
+// Expose a global so DownloadButton.astro can fire the download event
+window.__ackeeAction = (key, value) => {
+  instance.action(EVENT_ID, { key, value });
+};
+</script>

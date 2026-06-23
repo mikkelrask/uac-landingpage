@@ -10,6 +10,7 @@ export default defineConfig({
 			components: {
 				Hero: "./src/components/custom/Hero.astro",
 				SocialIcons: "./src/components/custom/SocialIcons.astro",
+				Footer: "./src/components/custom/Footer.astro",
 			},
 			title: "UAC SOFT",
 			description:

@@ -226,6 +226,13 @@ const { compact = false } = Astro.props;
     if (e.key === "Escape") closeDropdown();
   });
 
+  // --- Track download clicks ---
+  downloadMain.addEventListener("click", function () {
+    if (window.__ackeeAction) {
+      window.__ackeeAction("Download", 1);
+    }
+  });
+
   // --- Fetch latest release ---
   const detectedOS = detectOS();
 
