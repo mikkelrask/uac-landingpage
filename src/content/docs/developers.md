@@ -13,9 +13,9 @@ You can also check out the more detailed explanation about the project and its s
 
 ### Technology Stack
 
-- **Frontend**: React 19 + TypeScript + TailwindCSS v3
+- **Frontend**: React + TypeScript + TailwindCSS v3
 - **Backend**: Express.js API server
-- **Desktop**: Tauri (Rust) — bootstraps and proxies the Node.js backend
+- **Desktop**: Electron with electron-vite
 - **Build Tool**: Vite (for the renderer)
 - **File Watching**: Chokidar for real-time WAD directory synchronization
 - **State Management**: TanStack Query (React Query)
@@ -27,45 +27,48 @@ You can also check out the more detailed explanation about the project and its s
 
 ```
 uaclaunchcontrol/
-├── client/            # React frontend
-│   └── src/
-│       ├── api.ts     # Fetch-based API client (localhost:7666)
-│       ├── App.tsx    # Root: router, auto-updater, modals
-│       ├── pages/     # GamesPage (/), InstallPage (/install), not-found
-│       ├── components/      # Custom components (CatalogManager, GameCard, etc.)
-│       │   └── ui/          # shadcn/ui primitives (40+ components)
-│       ├── hooks/           # useAutoUpdater, useToast, useMobile
-│       ├── lib/             # gameService, fileService, queryClient, utils
-│       ├── icons/           # DoomVersionIcon + PNG assets
-│       └── assets/          # Fonts, images, logos
-├── server/            # Express.js API backend
-│   ├── index.ts       # Server setup (port 7666), CORS, logging middleware
-│   ├── routes.ts      # All REST API endpoints
-│   ├── storage.ts     # JSON file-based persistence + WAD file watcher
-│   └── services/
-│       ├── fileService.ts  # File system operations
-│       └── gameService.ts  # Game config management
-├── src-tauri/         # Rust/Tauri desktop wrapper
-│   ├── src/
-│   │   ├── main.rs    # Bootstraps Node.js server, proxy, window management
-│   │   └── ...
-│   └── ...
-└── shared/            # Shared TypeScript types
-    └── schema.ts      # All interfaces: IMod, IModFile, IDoomVersion, etc.
+├── src/
+│   ├── main/
+│   │   ├── index.ts          # Electron main process
+│   │   └── server/
+│   │       ├── index.ts      # Server setup (port 7666), CORS, logging
+│   │       ├── routes.ts     # REST API endpoints
+│   │       ├── storage.ts    # JSON file persistence + WAD file watcher
+│   │       └── services/
+│   │           ├── fileService.ts   # File system operations
+│   │           ├── gameService.ts   # Game/protocol management
+│   │           ├── playerService.ts # Player data/achievements
+│   │           └── portService.ts   # Source port installation/selection
+│   ├── preload/
+│   │   └── index.ts/.d.ts    # Electron preload bridge
+│   └── renderer/
+│       └── src/
+│           ├── main.tsx      # React entry
+│           ├── App.tsx       # Root: router, auto-updater, modals
+│           ├── api.ts        # Fetch-based API client (localhost:7666)
+│           ├── pages/        # GamesPage (/), InstallPage (/install), not-found
+│           ├── components/   # Custom components (CatalogManager, GameCard, etc.)
+│           │   └── ui/       # shadcn/ui primitives (40+ components)
+│           ├── hooks/        # useAutoUpdater, useToast, useMobile
+│           ├── lib/          # gameService, fileService, queryClient, utils
+│           ├── icons/        # DoomVersionIcon + PNG assets
+│           └── assets/       # Fonts, images, logos
+└── shared/
+    └── schema.ts             # All interfaces: IMod, IModFile, IDoomVersion, etc.
 ```
 
 ### Data Flow
 
-1. **Tauri (Rust)** starts and spawns the Node.js Express API server on port `7666` as a background process.
+1. **Electron (Main)** starts and spawns the Express API server on port `7666`.
 2. **Express Server** manages JSON file storage at `~/.config/uac/`:
    - `settings.json` — App settings (paths, preferences)
    - `doomVersions.json` — Configured Doom versions/WADs
    - `modFileCatalogue.json` — Catalog of available mod files
-   - `mods/` — Individual mod configurations as JSON files
-3. **Chokidar** watches the WAD files directory for changes and syncs doom versions automatically.
+   - `mods/` — Individual Protocol configurations as JSON files
+3. **Chokidar** watches the WAD files directory for changes and syncs Doom versions automatically.
 4. **Renderer** (React app) communicates with the API server via HTTP fetch.
-5. **Media Proxy**: Images served via both `/api/media?path=` and `/images/:fileName` to bypass Tauri's `tauri://` security restrictions.
-6. **Auto-Update**: Uses `electron-updater` (legacy) with GitHub releases. New Tauri-based builds use Tauri's built-in updater.
+5. **Media Proxy**: Images served via both `/api/media?path=` and `/images/:fileName` to bypass Electron security restrictions.
+6. **Auto-Update**: Uses `electron-updater` with GitHub releases.
 
 ## Getting Started
 
@@ -93,7 +96,7 @@ npm run dev
 
 This will:
 - Start the Vite dev server for the renderer (with proxy to Express on port 7666)
-- Start the Tauri development environment
+- Start the Electron main process
 - Start the Chokidar WAD watcher for real-time sync
 
 ```bash

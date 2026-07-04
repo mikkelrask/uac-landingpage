@@ -3,7 +3,7 @@ title: Add a Base Game WAD
 description: Import and manage base game IWAD files for use with source ports.
 ---
 
-Before you can launch any **Game Instance**, you'll need at least one **base game WAD** available to the system. The base game WAD is the foundation — the "planet" your mission takes place on. Without it, your source port has nothing to run.
+Before you can launch any **Protocol**, you'll need at least one **base game WAD** available to the system. The base game WAD is the foundation — the "planet" your mission takes place on. Without it, your source port has nothing to run.
 
 ## What is a base game WAD?
 
@@ -35,7 +35,7 @@ Review the details and click **Confirm Import** to finalize. The file will be co
 
 ## Post-Import: Configuration
 
-Once a WAD has been imported, you can configure it in `core_settings` → **WAD Config**:
+Once a WAD has been imported, you can configure it in **Settings** → **WAD Config**:
 
 - **Name** — The display name for the WAD (e.g. "Doom II: Hell on Earth" instead of `doom2.wad`)
 - **Icon** — A custom icon displayed in the sidebar and dropdowns

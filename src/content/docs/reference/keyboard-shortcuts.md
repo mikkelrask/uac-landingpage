@@ -17,7 +17,7 @@ description: Global keyboard shortcuts for quick navigation in UAC Launch Contro
 | `w` | **Install page — WAD Files tab** | Navigates to the Install page and switches to the WAD Files import tab. |
 | `/` | **Focus search** | Moves focus to the database search input in the top navigation bar. |
 | `?` | **Shortcuts help** | Opens this cheat sheet. |
-| `Ctrl + .` | **Open Settings** | Opens `core_settings`. On macOS this is `Cmd + .` |
+| `Ctrl + .` | **Open Settings** | Opens **Settings**. On macOS this is `Cmd + .` |
 
 ## How it works
 

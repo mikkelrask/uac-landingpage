@@ -3,13 +3,13 @@ title: Manage Source Ports
 description: Configure multiple source port executables in UAC Launch Control.
 ---
 
-You can configure multiple source ports (different engines or different versions of the same engine) and pick which one to use per game instance.
+You can configure multiple source ports (different engines or different versions of the same engine) and pick which one to use per protocol.
 
 ![Source Port Settings](/source-port-settings.png)
 
 ## Accessing source ports
 
-Click the **cog icon** (`⚙️`) in the top navigation → **core_settings** → **Paths** tab. The **Source Ports** section is at the top under **CORE INFRASTRUCTURE**.
+Click the **cog icon** (`⚙️`) in the top navigation → **Settings** → **Paths** tab. The **Source Ports** section is at the top under **CORE INFRASTRUCTURE**.
 
 ## Scanning for source ports
 
@@ -32,11 +32,11 @@ Rather than hunting for executables yourself, click **Scan Path** and the system
 
 ## Setting a default
 
-Each port has a **radio dot** on the left — click it to set that port as the default. The default is used when a game instance has no specific port assigned, or when an imported modpack can't be matched to any port.
+Each port has a **radio dot** on the left — click it to set that port as the default. The default is used when a protocol has no specific port assigned, or when an imported modpack can't be matched to any port.
 
 ## Ignoring (hiding) ports
 
-Click the **eye icon** to toggle visibility in game instance selectors. Hidden ports remain in your config but won't appear in the combobox dropdown.
+Click the **eye icon** to toggle visibility in protocol selectors. Hidden ports remain in your config but won't appear in the combobox dropdown.
 
 ## Editing and deleting
 
@@ -45,13 +45,13 @@ Click the **eye icon** to toggle visibility in game instance selectors. Hidden p
 
 ## Using ports in game instances
 
-When installing or editing a game instance, the **Source Port** field is a filterable combobox showing only non-ignored ports (name, family badge, version). No free-text entry — you must pick from the list.
+When installing or editing a protocol, the **Source Port** field is a filterable combobox showing only non-ignored ports (name, family badge, version). No free-text entry — you must pick from the list.
 
 ## Fallback chain
 
 When launching a game, the executable is resolved in this order:
 
-1. The port referenced by the game instance (`sourcePortId`)
+1. The port referenced by the protocol (`sourcePortId`)
 2. The default port (`defaultSourcePortId`)
 3. The first non-ignored port in the list
 4. Error — if no ports are configured, you'll be prompted to add one.

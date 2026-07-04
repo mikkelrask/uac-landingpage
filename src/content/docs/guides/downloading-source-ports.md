@@ -79,7 +79,7 @@ This is the go-to when:
 
 The directory lists every numbered release as a subfolder (e.g. `g4-12-2/`, `g4-11-3/`, `g4-10-0/`). Inside each you'll find the same platform packages as the latest release. Just browse to the version you need, download the archive, and extract it anywhere on your system.
 
-> **Tip:** You can leave multiple versions of both UZDoom and GZDoom installed at the same time. Add each as a separate source port in UAC Launch Control and pick which one to use per game instance. See the [Manage Source Ports](/guides/source-ports/) guide.
+> **Tip:** You can leave multiple versions of both UZDoom and GZDoom installed at the same time. Add each as a separate source port in UAC Launch Control and pick which one to use per protocol. See the [Manage Source Ports](/guides/source-ports/) guide.
 
 ---
 

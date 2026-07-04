@@ -45,10 +45,10 @@ The **Source Ports** section (under **CORE INFRASTRUCTURE**) lets you manage mul
 - Click **Scan Path** to automatically detect supported source ports installed on your system.
 - Use the inline form to set **name**, **version**, **executable path**, and **family**.
 - Click the **radio dot** on the left to set a port as the **default**.
-- Use the **eye icon** to hide a port from game instance selectors without deleting it.
+- Use the **eye icon** to hide a port from protocol selectors without deleting it.
 - Use the **pencil** (edit) and **trash** (delete) icons to manage ports.
 
-See the **[Manage source ports](/guides/source-ports/)** page for full details.
+> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per protocol, not per WAD. See [Manage source ports](/guides/source-ports/).
 
 ---
 
@@ -59,8 +59,8 @@ See the **[Manage source ports](/guides/source-ports/)** page for full details.
 | Use | Default | Notes |
 |-----|---------|-------|
 | **Wads** | `~/.config/uac/wads` | Directory for base game WAD files. |
-| **Mods** | `~/.config/uac/mods` | Each game instance gets a `.json` file here. Mod files are copied to a `files` subdirectory. |
-| **Saves** | `~/.config/uac/saves` | Save data, subdirectories created per game instance (e.g. `dragon-sector-remake`). |
+| **Mods** | `~/.config/uac/mods` | Each protocol gets a `.json` file here. Mod files are copied to a `files` subdirectory. |
+| **Saves** | `~/.config/uac/saves` | Save data, subdirectories created per protocol (e.g. `dragon-sector-remake`). |
 | **Screenshots** | `~/Pictures/UAC Launch Control/screenshots` | Screenshot output, uses your source port's default naming. |
 
 All paths can be typed manually or set via the folder icon (`📂`) file picker.
@@ -84,4 +84,4 @@ The application auto-detects these WADs: `doom.wad`, `doomu.wad`, `doom2.wad`, `
 - **Hide from Interface** — excludes the WAD from the sidebar and base game selectors (useful for auxiliary files like `voices.wad`).
 - **File Source** — the actual file path on disk (read-only).
 
-> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per game instance, not per WAD. See [Manage source ports](/guides/source-ports/).
+> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per protocol, not per WAD. See [Manage source ports](/guides/source-ports/).

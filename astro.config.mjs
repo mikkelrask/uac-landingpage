@@ -45,6 +45,7 @@ export default defineConfig({
 						{ label: "Downloading Source Ports", slug: "guides/downloading-source-ports" },
 						{ label: "Add Mod Files", slug: "guides/mod-files" },
 						{ label: "Add Base Game WAD", slug: "guides/base-game-wad" },
+						{ label: "Troubleshooting", slug: "guides/troubleshooting" },
 					],
 				},
 				{

@@ -29,7 +29,7 @@ A submission is triggered when:
 
 ## Enabling Registry Lookups
 
-1. Open `core_settings` via the cog icon (or press `Ctrl+.`)
+1. Open **Settings** via the cog icon (or press `Ctrl+.`)
 2. Go to the **General** tab
 3. Toggle **Registry Lookup** to the **ON** position
 
@@ -61,4 +61,4 @@ The Registry API lives at `https://db.uac-soft.online`. It exposes these endpoin
 
 Lookups are performed asynchronously and do not block the catalog workflow — if the Registry is unreachable, the file is added locally without metadata, and no error is shown.
 
-Submitted entries go through a review process before being approved into the active Registry. This ensures the database remains accurate and free of spam.
+Submitted entries go through a manual review process before being approved into the active Registry. This ensures the database remains accurate and free of spam.
