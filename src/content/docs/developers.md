@@ -1,9 +1,9 @@
 ---
 title: For Developers
-description: Technical details about UAC Launch Control — architecture, setup, API, and contribution guide.
+description: "Technical details about UAC Launch Control: architecture, setup, API, and contribution guide."
 ---
 
-A little about the technical details of the **UAC Launch Control** app — if you want to contribute, or build for yourself, read more below.
+A little about the technical details of the **UAC Launch Control** app. If you want to contribute, or build it for yourself, read on.
 
 You can also check out the more detailed explanation about the project and its structure on **[DeepWiki](https://deepwiki.com/mikkelrask/uaclaunchcontrol)**.
 
@@ -20,7 +20,7 @@ You can also check out the more detailed explanation about the project and its s
 - **File Watching**: Chokidar for real-time WAD directory synchronization
 - **State Management**: TanStack Query (React Query)
 - **UI Components**: Radix UI + shadcn/ui
-- **Routing**: wouter (path-only, no query param tracking)
+- **Routing**: wouter (path-based; tab state via URL query params, e.g. `/install?tab=files`)
 - **Icons**: Lucide React + Nerd Font (Atkinson Mono Nerd Font)
 
 ### Application Structure
@@ -35,10 +35,12 @@ uaclaunchcontrol/
 │   │       ├── routes.ts     # REST API endpoints
 │   │       ├── storage.ts    # JSON file persistence + WAD file watcher
 │   │       └── services/
-│   │           ├── fileService.ts   # File system operations
-│   │           ├── gameService.ts   # Game/protocol management
-│   │           ├── playerService.ts # Player data/achievements
-│   │           └── portService.ts   # Source port installation/selection
+│   │           ├── fileService.ts     # File system operations
+│   │           ├── freedoomService.ts # FreeDoom manifest fetch + download
+│   │           ├── gameService.ts     # Game/protocol management
+│   │           ├── gameplayWatchers.ts # Session/process monitoring
+│   │           ├── playerService.ts   # Player data/achievements
+│   │           └── portService.ts     # Source port installation/selection
 │   ├── preload/
 │   │   └── index.ts/.d.ts    # Electron preload bridge
 │   └── renderer/
@@ -53,18 +55,20 @@ uaclaunchcontrol/
 │           ├── lib/          # gameService, fileService, queryClient, utils
 │           ├── icons/        # DoomVersionIcon + PNG assets
 │           └── assets/       # Fonts, images, logos
-└── shared/
-    └── schema.ts             # All interfaces: IMod, IModFile, IDoomVersion, etc.
+└── src/shared/
+    ├── schema.ts             # All interfaces: IProtocol, IModFile, IDoomVersion, etc.
+    ├── debug.ts              # DEBUG-gated logging helper
+    └── categories.ts         # Mod file catalog categories
 ```
 
 ### Data Flow
 
 1. **Electron (Main)** starts and spawns the Express API server on port `7666`.
 2. **Express Server** manages JSON file storage at `~/.config/uac/`:
-   - `settings.json` — App settings (paths, preferences)
-   - `doomVersions.json` — Configured Doom versions/WADs
-   - `modFileCatalogue.json` — Catalog of available mod files
-   - `mods/` — Individual Protocol configurations as JSON files
+   - `settings.json`: App settings (paths, preferences)
+   - `doomVersions.json`: Configured Doom versions/WADs
+   - `modFileCatalogue.json`: Catalog of available mod files
+   - `mods/`: Individual Protocol configurations as JSON files
 3. **Chokidar** watches the WAD files directory for changes and syncs Doom versions automatically.
 4. **Renderer** (React app) communicates with the API server via HTTP fetch.
 5. **Media Proxy**: Images served via both `/api/media?path=` and `/images/:fileName` to bypass Electron security restrictions.
@@ -147,14 +151,25 @@ All application data is stored in `~/.config/uac/`:
 
 ```json
 {
-  "sourcePortPath": "",
+  "sourcePorts": [],
+  "defaultSourcePortId": null,
+  "defaultDoomVersionId": null,
   "theme": "dark",
   "savegamesPath": "~/.config/uac/saves",
   "modsDirectory": "~/.config/uac/mods",
   "screenshotsPath": "~/Pictures/UAC Launch Control/screenshots",
+  "databaseLinkPresets": [
+    { "name": "MODDB", "url": "https://www.moddb.com/games/doom-ii" },
+    { "name": "ZDOOM", "url": "https://forum.zdoom.org/" },
+    { "name": "DOOMWORLD", "url": "https://www.doomworld.com/" },
+    { "name": "ITCH", "url": "https://itch.io/game-mods/tag-doom" }
+  ],
+  "selectedPresetIndex": 0,
   "wadFilesDirectory": "~/.config/uac/wads",
   "autoUpdateEnabled": true,
-  "registryLookupEnabled": false
+  "registryLookupEnabled": false,
+  "showLaunchPreview": true,
+  "uiScale": 100
 }
 ```
 
@@ -162,58 +177,69 @@ All application data is stored in `~/.config/uac/`:
 
 The Express server exposes the following REST API on `localhost:7666`:
 
-### Mods
-- `GET /api/mods` — List all mods (optional `?version=` and `?search=` query params)
-- `GET /api/mods/:id` — Get specific mod with its files
-- `POST /api/mods` — Create new mod
-- `PUT /api/mods/:id` — Update mod
-- `DELETE /api/mods/:id` — Delete mod
-- `POST /api/mods/:id/launch` — Launch a mod (spawns source port)
+### Protocols (game instances)
+- `GET /api/protocols`: List all protocols (optional `?version=` and `?search=` query params)
+- `GET /api/protocols/:id`: Get a specific protocol
+- `POST /api/protocols`: Create a protocol
+- `PUT /api/protocols/:id`: Update a protocol
+- `DELETE /api/protocols/:id`: Delete a protocol
+- `POST /api/protocols/:id/launch`: Launch a protocol (spawns source port)
+- `POST /api/protocols/test-launch`: Test a launch configuration without saving
+- `POST /api/protocols/:id/playtime`: Record playtime for a protocol
+
+### FreeDoom
+- `GET /api/freedoom/manifest`: Fetch the current FreeDoom release manifest
+- `POST /api/freedoom/download`: Download a FreeDoom bundle (`phase12` or `freedm`)
 
 ### Doom Versions / WADs
-- `GET /api/versions` — List all Doom versions
-- `PUT /api/versions` — Save all Doom versions (full array replace)
-- `GET /api/versions/:slug` — Get Doom version by slug
-- `PUT /api/versions/:id` — Update a single Doom version
-- `POST /api/wads/import` — Import a .wad file with MD5-based renaming
+- `GET /api/versions`: List all Doom versions
+- `PUT /api/versions`: Save all Doom versions (full array replace)
+- `GET /api/versions/:slug`: Get Doom version by slug
+- `PUT /api/versions/:id`: Update a single Doom version
+- `POST /api/wads/import`: Import a .wad file with MD5-based renaming
 
 ### Mod File Catalog
-- `GET /api/mod-files/catalog` — List catalog files
-- `POST /api/mod-files/catalog` — Add file to catalog
-- `PUT /api/mod-files/catalog/:id` — Update catalog entry
-- `DELETE /api/mod-files/catalog/:id` — Delete catalog entry
-- `POST /api/mod-files/hash` — Compute MD5 hash of a file
-- `POST /api/mod-files/move` — Move file to mod folder with hash-based naming
+- `GET /api/mod-files/catalog`: List catalog files
+- `POST /api/mod-files/catalog`: Add file to catalog
+- `PUT /api/mod-files/catalog/:id`: Update catalog entry
+- `DELETE /api/mod-files/catalog/:id`: Delete catalog entry
+- `POST /api/mod-files/hash`: Compute MD5 hash of a file
+- `POST /api/mod-files/move`: Move file to mod folder with hash-based naming
+- `POST /api/mod-files/unzip-scan`: Scan a zip archive for supported files
+- `POST /api/mod-files/unzip-import`: Import files from a zip archive
+- `POST /api/mod-files/unrar-scan`: Scan a RAR archive for supported files
 
 ### Settings
-- `GET /api/settings` — Get expanded application settings
-- `PUT /api/settings` — Update settings
+- `GET /api/settings`: Get expanded application settings
+- `PUT /api/settings`: Update settings
 
 ### Media & Files
-- `GET /api/media?path=` — Proxy for serving local files safely
-- `GET /images/:fileName` — Serve images from the images directory
-- `POST /api/screenshots/upload` — Upload/copy a screenshot to images dir
-- `POST /api/mod/download-image` — Download an image from a URL
-- `POST /api/move-file` — Move a file from one path to another
-- `POST /api/dialog/open` — Open native file/folder picker (supports tilde)
+- `GET /api/media?path=`: Proxy for serving local files safely
+- `GET /images/:fileName`: Serve images from the images directory
+- `POST /api/screenshots/upload`: Upload/copy a screenshot to images dir
+- `GET /api/screenshots/:fileName/content`: Fetch a screenshot's image data
+- `POST /api/screenshots/import`: Import a screenshot
+- `POST /api/protocol/download-image`: Download an image from a URL
+- `POST /api/move-file`: Move a file from one path to another
+- `POST /api/file-read`: Read a text file's contents
+- `POST /api/dialog/open`: Open native file/folder picker (supports tilde)
 
-### Migration
-- `GET /api/migration/check` — Check for legacy config from previous versions
-- `POST /api/migration/execute` — Execute legacy migration
+### Configs
+- `POST /api/configs/blank`: Create a blank `settings.cfg` for a mod file
 
 ## Path Aliases
 
 Defined in `electron.vite.config.ts` (legacy) or Vite config:
 
-- `@/` — Maps to `client/src/` (e.g. `@/components/ui/button`)
-- `@shared/` — Maps to `shared/` (e.g. `@shared/schema`)
+- `@/`: Maps to `src/renderer/src/` (e.g. `@/components/ui/button`)
+- `@shared/`: Maps to `src/shared/` (e.g. `@shared/schema`)
 
 ## Styling
 
 - TailwindCSS v3 with class-based dark mode
 - Custom app utility classes: `bg-app-primary`, `bg-app-secondary`, `text-app-primary`, `text-app-muted`, `border-app`, `bg-accent-highlight`
 - Font: **Aldrich** (sans, bundled via `@font-face`), with Atkinson Mono Nerd Font as fallback for icon glyphs
-- UI components in `client/src/components/ui/` (40+ shadcn/ui primitives)
+- UI components in `src/renderer/src/components/ui/` (40+ shadcn/ui primitives)
 
 ## Dialog Pattern
 
@@ -271,12 +297,18 @@ Global shortcuts use URL query params (`/install?tab=files`) + custom DOM events
 
 All interfaces in `shared/schema.ts` use `I` prefix:
 
-- **IMod** — Mod/game instance (title, description, files, source port, etc.)
-- **IModFile** — Individual mod file entry (path, hash, type, load order)
-- **IDoomVersion** — Base game/WAD configuration (name, slug, executable, icon)
-- **IAppSettings** — Application settings (paths, theme, toggles, database links)
-- **IUpdateInfo** — Auto-update status (version, release notes, download progress)
-- **IResponseMessage** — Generic API response wrapper
+- **IProtocol**: Game instance/protocol (title, description, files, source port, etc.)
+- **IModFile**: Individual mod file entry (path, hash, type, load order)
+- **IDoomVersion**: Base game/WAD configuration (name, slug, executable, icon)
+- **ISourcePort**: Source port executable configuration (name, family, path, default flag)
+- **IDatabaseLink**: Preset database link (name + URL) for the nav shortcut
+- **IAppSettings**: Application settings (paths, theme, toggles, database links)
+- **IUpdateInfo**: Auto-update status (version, release notes, download progress)
+- **IPlayerData** / **IPlayerStats** / **IAchievementState**, Player stats & achievements
+- **IDoomVersionDelta**: WAD watcher change notification
+- **IInstallType**: Supported install type descriptor
+- **IVersionData**: FreeDoom manifest version info
+- **IResponseMessage**: Generic API response wrapper
 
 ## Development Notes
 
@@ -284,8 +316,8 @@ All interfaces in `shared/schema.ts` use `I` prefix:
 
 The project uses separate TypeScript configurations:
 
-- `tsconfig.node.json` — Server code
-- `tsconfig.web.json` — Renderer process (includes `shared` via composite)
+- `tsconfig.node.json`: Server code
+- `tsconfig.web.json`: Renderer process (includes `shared` via composite)
 
 ### Code Style
 

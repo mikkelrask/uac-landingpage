@@ -3,85 +3,65 @@ title: Settings
 description: Configure UAC Launch Control through the settings panel.
 ---
 
-To open **Settings**, click the **cog icon** in the top navigation bar.
+Open Settings with the cog icon in the top navigation bar, or press `Ctrl + .`. The panel has five tabs: **General**, **Paths**, **Source Ports**, **WAD Config**, and **Advanced**.
 
-## General tab
+## General
 
-### PREFERENCES
+### Preferences
 
-- **App Theme** — switch between visual colour profiles:
-  - **UAC PHOBOS** — Default dark/red theme.
-  - **MAYKR** — Bright argent energy (light).
-  - **UAC TERMINAL** — Green phosphor display (keeps UAC red for warnings).
-  - **CUSTOM** — User-defined palette via the Advanced tab.
-- **Database Link** — changes the navigation shortcut in the top bar to your preferred mod source (ModDB, ZDoom Forum, DoomWorld, Itch.io).
-- **Launch Preview** — toggles the preview of the generated launch command in the Install page and per-game settings modal.
+- **App Theme**. Switch between the visual profiles:
+  - **UAC PHOBOS**, the default dark industrial look
+  - **MAYKR**, a bright light theme
+  - **PLUTONIA TERMINAL**, green phosphor with UAC red kept for warnings and destructive actions
+  - **CUSTOM**, your own palette via the Advanced tab
+- **Database Link**. Changes the navigation shortcut in the top bar to your preferred mod source (ModDB, ZDoom Forum, DoomWorld, Itch.io).
+- **Default View**. Sets the starting view mode when you open the games page.
+- **UI Scale**. Adjusts the overall interface scaling (default 100%).
+- **Launch Preview**. Shows the generated launch command on the Install page and in the per-game settings modal.
 
-### TECHNICAL SPECIFICATIONS
+### Technical
 
-- **Auto-update** — automatically check for application updates on startup (default: on).
-- **Registry Lookup** — when enabled, the system queries the online UAC Registry for mod file metadata when adding files to your catalog.
-- **Manual update check** — check for updates on demand.
-- **Config Path** — read-only display of where `settings.json` is stored on disk.
+- **Auto-update**. Checks for application updates on startup (on by default).
+- **Registry Lookup**. When enabled, the app queries the online UAC Registry for mod file metadata when you add files to your catalog. Off by default.
+- **Manual update check**. Check for updates on demand.
+- **Config Path**. Read-only display of where `settings.json` lives on disk.
 
-## Advanced tab
+## Paths
 
-### CUSTOM THEME EDITOR
+The directories the app uses. Each can be typed manually or set with the folder icon.
 
-Available when **App Theme** is set to **CUSTOM**. Paste HSL variable overrides in CSS format to define your own colour palette. See the **[Theming guide](/reference/theming/)** for the full variable reference.
+| Use | Default |
+|-----|---------|
+| **Wads** | `~/.config/uac/wads` |
+| **Mods** | `~/.config/uac/mods` |
+| **Saves** | `~/.config/uac/saves` |
+| **Screenshots** | `~/Pictures/UAC Launch Control/screenshots` |
 
-- **Wrap in .custom { }** — surrounds your CSS block with the required `.custom {}` wrapper.
-- **Reset to defaults** — populates the editor with the default dark theme values as a starting point.
+> **Note on `~`:** the tilde expands to your home directory. Windows: `C:\Users\YOUR-NAME`. macOS: `/Users/YOUR-NAME`. Linux: `/home/YOUR-USER`.
 
-## Paths tab
+## Source Ports
 
-Configure directories for **Source Ports**, **Wads**, **Mods**, **Saves** and **Screenshots**.
+Manage the engine executables (GZDoom, UZDoom, Helion, Zandronum, and others). You can scan for installed ports, add one manually, or download a port directly inside the app. See [Manage Source Ports](/guides/source-ports/) and [Downloading Source Ports](/guides/downloading-source-ports/).
 
-### Source Ports
+## WAD Config
 
-The **Source Ports** section (under **CORE INFRASTRUCTURE**) lets you manage multiple source port executables.
+The tab starts with a **FreeDoom** section. FreeDoom is a free replacement for the classic Doom game data, so you can get started without buying anything. Click **FreeDoom (Phase 1 + 2)** to download both IWADs, or **FreeDM** for the deathmatch version. The app fetches the files, verifies their checksums, and registers them automatically. An **Installed** badge appears once they are present.
 
-- Click **+ Add Port** to open a file picker and select an executable.
-- Click **Scan Path** to automatically detect supported source ports installed on your system.
-- Use the inline form to set **name**, **version**, **executable path**, and **family**.
-- Click the **radio dot** on the left to set a port as the **default**.
-- Use the **eye icon** to hide a port from protocol selectors without deleting it.
-- Use the **pencil** (edit) and **trash** (delete) icons to manage ports.
+Below that, each base game WAD you have imported gets a row:
 
-> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per protocol, not per WAD. See [Manage source ports](/guides/source-ports/).
+- **Icon**. Click the icon preview to set a custom image.
+- **Launch Arguments**. Flags such as `-iwad` passed to the source port.
+- **Additional Parameters**. Extra engine parameters, e.g. `-nomonsters -warp 01`.
+- **Hide from Interface**. Excludes the WAD from the sidebar and base game selectors. Useful for auxiliary files like `voices.wad`.
+- **File Source**. The actual file path on disk (read-only).
 
----
+The **radio dot** on the left of a WAD marks it as the **default WAD**. New protocols pre-fill their Base WAD from this selection.
 
-### Other Paths
+## Advanced
 
-**Default values:**
+### Custom Theme Editor
 
-| Use | Default | Notes |
-|-----|---------|-------|
-| **Wads** | `~/.config/uac/wads` | Directory for base game WAD files. |
-| **Mods** | `~/.config/uac/mods` | Each protocol gets a `.json` file here. Mod files are copied to a `files` subdirectory. |
-| **Saves** | `~/.config/uac/saves` | Save data, subdirectories created per protocol (e.g. `dragon-sector-remake`). |
-| **Screenshots** | `~/Pictures/UAC Launch Control/screenshots` | Screenshot output, uses your source port's default naming. |
+Active when **App Theme** is set to **CUSTOM**. Paste HSL variable overrides in CSS format to define your own colour palette. See the [Theming guide](/reference/theming/) for the full variable reference.
 
-All paths can be typed manually or set via the folder icon (`📂`) file picker.
-
-### Note on `~`
-
-The tilde (`~`) expands to your home directory:
-- **Windows:** `C:\Users\YOUR-NAME`
-- **macOS:** `/Users/YOUR-NAME`
-- **Linux:** `/home/YOUR-USER`
-
-## Wad Config tab
-
-Configure settings for each detected base game WAD — shown name, icon, launch arguments, and additional parameters.
-
-The application auto-detects these WADs: `doom.wad`, `doomu.wad`, `doom2.wad`, `doomii.wad`, `tnt.wad`, `plutonia.wad`, `freedoom1.wad`, `freedoom2.wad`, `heretic.wad`, `hexen.wad`, `hexdd.wad`, `strife.wad` — each gets a default name and icon.
-
-- **Icon** — click the icon preview to set a custom image.
-- **Launch Arguments** — e.g. `-iwad` or other flags passed to the source port.
-- **Additional Parameters** — e.g. `-nomonsters -warp 01`.
-- **Hide from Interface** — excludes the WAD from the sidebar and base game selectors (useful for auxiliary files like `voices.wad`).
-- **File Source** — the actual file path on disk (read-only).
-
-> **Note:** Source ports are managed globally via the **Paths tab** — you assign a source port per protocol, not per WAD. See [Manage source ports](/guides/source-ports/).
+- **Wrap in .custom { }** surrounds your CSS with the required `.custom {}` wrapper.
+- **Reset to defaults** fills the editor with the default dark theme values as a starting point.

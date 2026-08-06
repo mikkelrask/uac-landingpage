@@ -3,7 +3,7 @@ title: Theming
 description: Customize the look and feel of UAC Launch Control with built-in themes or custom CSS.
 ---
 
-The UAC Launch Control terminal supports four visual profiles: **Dark** (default), **Light**, **Terminal Green**, and **Custom**. All themes are driven by CSS custom properties (HSL variables) with live preview — switch between them instantly and only commit on save.
+UAC Launch Control ships with four visual profiles: **UAC PHOBOS** (dark, default), **MAYKR** (light), **PLUTONIA TERMINAL** (green), and **CUSTOM**. All themes are driven by CSS custom properties (HSL variables) with live preview. Switch between them instantly, and nothing is saved until you apply it.
 
 ### Selecting a theme
 
@@ -18,13 +18,13 @@ The UAC Launch Control terminal supports four visual profiles: **Dark** (default
 | **PLUTONIA TERMINAL** | Green-phosphor matrix aesthetic. Early-90s UAC terminal feel. UAC red retained for warnings and destructive actions. |
 | **CUSTOM** | User-defined palette via the Advanced tab editor. |
 
-The interface updates immediately when you select a theme. Click **> Apply <** to save it permanently, or close without saving to revert to the previous theme.
+The interface updates immediately as you pick. Click **Apply** to save the theme permanently, or close without applying to revert to the previous one.
 
 ---
 
 ### Custom theme 
 
-The **Advanced** tab now contains the Custom Theme Editor, only active when **CUSTOM** is selected in the General tab. Here you can paste HSL variable overrides for any of the theme's CSS custom properties.
+The **Advanced** tab holds the Custom Theme Editor, active only when **CUSTOM** is selected in the General tab. Here you can paste HSL variable overrides for any of the theme's CSS custom properties.
 
 #### Format
 
@@ -84,7 +84,7 @@ The values use the **HSL color model**:
 | `--border-sidebar` | `220 12% 14%` | Sidebar separators |
 
 ### Examples
-##### Cyperpunk Neon
+##### Cyberpunk Neon
 ![Theming example](https://github.com/mikkelrask/uaclaunchcontrol/blob/main/IMG/0.3.4-details.png?raw=true)
 
 ```css
@@ -354,7 +354,7 @@ The values use the **HSL color model**:
 ```
 
 #### VOID WALKER
-![](/0.3.5.png)
+![](/void-walker.png)
 ```css
 .custom {
   --background: 275 60% 4%;

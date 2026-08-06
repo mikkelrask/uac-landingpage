@@ -4,7 +4,7 @@ import starlight from "@astrojs/starlight";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://uac-launch-control.pages.dev",
+	site: "https://uac-soft.online",
 	integrations: [
 		starlight({
 			components: {
@@ -46,6 +46,7 @@ export default defineConfig({
 						{ label: "Add Mod Files", slug: "guides/mod-files" },
 						{ label: "Add Base Game WAD", slug: "guides/base-game-wad" },
 						{ label: "Troubleshooting", slug: "guides/troubleshooting" },
+						{ label: "Acquiring Doom WADs", slug: "guides/acquiring-doom" },
 					],
 				},
 				{

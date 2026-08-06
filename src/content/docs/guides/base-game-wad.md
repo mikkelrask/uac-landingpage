@@ -3,13 +3,25 @@ title: Add a Base Game WAD
 description: Import and manage base game IWAD files for use with source ports.
 ---
 
-Before you can launch any **Protocol**, you'll need at least one **base game WAD** available to the system. The base game WAD is the foundation — the "planet" your mission takes place on. Without it, your source port has nothing to run.
+Before you can launch any **Protocol**, you need at least one **base game WAD** available to the system. The base game WAD is the foundation, the "planet" your mission takes place on. Without it, your source port has nothing to run.
 
 ## What is a base game WAD?
 
-A **base game WAD** (or IWAD) is the original game data file — `doom.wad`, `doom2.wad`, `heretic.wad`, `freedoom1.wad`, etc. These are **not** mods; they are the core game assets that every mod builds upon.
+A **base game WAD** (or IWAD) is the original game data file, such as `doom.wad`, `doom2.wad`, `heretic.wad`, or `freedoom1.wad`. These are not mods; they are the core game assets that every mod builds upon.
 
 The system stores and manages these in your configured **WAD Files Directory**.
+
+## Getting a base game WAD
+
+You need actual game data to launch anything, and you have two routes:
+
+- **Own DOOM or DOOM II?** (Steam, GOG, or the original CDs) Your WAD files are in the game's install folder. Skip to [Adding a WAD](#adding-a-wad).
+- **Don't own it? Grab FreeDoom.** FreeDoom is a free, legally redistributable replacement for the classic DOOM game data, no purchase required. UAC Launch Control can download it for you:
+  1. Go to the **WAD Files** tab (during onboarding or on the Install page), or **Settings → Wad Config**.
+  2. In the **FreeDoom** section, click **FreeDoom (Phase 1 + 2)**. The app downloads both IWADs (`freedoom1.wad`, `freedoom2.wad`), verifies their checksums, and registers them automatically.
+  3. A **FreeDM** option is also available if you fancy the deathmatch-only IWAD.
+
+Downloaded IWADs are stored in `~/.config/uac/freedoom/` and appear in the WAD list like any other base game.
 
 ## Adding a WAD
 
@@ -27,9 +39,9 @@ Navigate to the **Install** page and switch to the **WAD Files** tab.
 
 Once a WAD file is selected, the system will display:
 
-- **Source File** — the original filename of the selected WAD
-- **Stored As** — the filename it will be saved as (an MD5 hash-based name to prevent collisions, e.g. `doom2-<hash>.wad`)
-- **MD5** — the computed MD5 checksum for integrity verification
+- **Source File**: the original filename of the selected WAD
+- **Stored As**: the filename it will be saved as (an MD5 hash-based name to prevent collisions, e.g. `doom2-<hash>.wad`)
+- **MD5**: the computed MD5 checksum for integrity verification
 
 Review the details and click **Confirm Import** to finalize. The file will be copied to your WAD directory and registered in the system.
 
@@ -37,12 +49,12 @@ Review the details and click **Confirm Import** to finalize. The file will be co
 
 Once a WAD has been imported, you can configure it in **Settings** → **WAD Config**:
 
-- **Name** — The display name for the WAD (e.g. "Doom II: Hell on Earth" instead of `doom2.wad`)
-- **Icon** — A custom icon displayed in the sidebar and dropdowns
-- **Engine Runtime** — Override the source port executable for this specific WAD (e.g. if `heretic.wad` needs a different engine)
-- **Launch Arguments** — Additional command-line arguments specific to this WAD
-- **Additional Parameters** — Extra engine parameters (e.g. `-nomonsters -warp 01`)
-- **Hide from Interface** — Excludes the WAD from base game dropdowns and the sidebar. Useful for support files like `voices.wad` that `strife.wad` requires but shouldn't appear as a selectable base game.
+- **Name**: The display name for the WAD (e.g. "Doom II: Hell on Earth" instead of `doom2.wad`)
+- **Icon**: A custom icon displayed in the sidebar and dropdowns
+- **Engine Runtime**: Override the source port executable for this specific WAD (e.g. if `heretic.wad` needs a different engine)
+- **Launch Arguments**: Additional command-line arguments specific to this WAD
+- **Additional Parameters**: Extra engine parameters (e.g. `-nomonsters -warp 01`)
+- **Hide from Interface**: Excludes the WAD from base game dropdowns and the sidebar. Useful for support files like `voices.wad` that `strife.wad` requires but shouldn't appear as a selectable base game.
 
 ### Auto-detected WADs
 
@@ -65,7 +77,7 @@ Any unrecognized WAD will use a fallback icon and its filename as the display na
 
 ## WAD Directory Watcher
 
-The system automatically watches your configured **WAD Files Directory** for changes. When new WADs are added (or removed) outside the application — e.g. copied in via file manager — the system picks up the changes in near real-time and updates the version registry accordingly.
+The system automatically watches your configured **WAD Files Directory** for changes. When new WADs are added (or removed) outside the application, e.g. copied in via file manager, the system picks up the changes in near real-time and updates the version registry accordingly.
 
 ## Storage
 

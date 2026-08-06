@@ -8,7 +8,7 @@ description: Install UAC Launch Control on Windows, macOS, or Linux.
 ## Windows
 
 1. **Download the setup file from the [releases](https://github.com/mikkelrask/uaclaunchcontrol/releases).**  
-Scroll down to **Assets** and find the Windows installer — ending with `.exe`.
+Scroll down to **Assets** and find the Windows installer, ending with `.exe`.
 
 2. **When download has finished, double click the downloaded file, follow any on screen instructions and the installer will take care of the rest.**
 
@@ -54,11 +54,10 @@ A `zip` version is also available for macOS if you prefer.
 
 On Linux you have different options, depending on your Linux distro and what you want.
 
-The **recommended way** is to use the `AppImage` from the **[Releases](https://github.com/mikkelrask/uaclaunchcontrol/releases)** page, as this is a selfcontained and selfupdating file, that requires no installation.
+The **recommended way** is to use the `AppImage` from the **[Releases](https://github.com/mikkelrask/uaclaunchcontrol/releases)** page. It is a single self-contained file that needs no installation and updates itself from within the app.
 
 1. Scroll down to **Assets** and click the `.AppImage` version.  
-This is a complete standalone file which requires no installation and gets updates from within the application itself.
-2. When the download has finished, simply double click the AppImage file to open the application.
+2. When the download finishes, double-click the AppImage to open the application.
 
 ### Ubuntu/Debian/PopOS/Mint
 
@@ -72,8 +71,7 @@ If you don't want to use the AppImage version you can use the `.deb` package on 
 sudo apt install /PATH/TO/DOWNLOAD/uac-launch-control_VERSION_amd64.deb
 ```
 
-If you are unsure about `/PATH/TO/DOWNLOAD/` you can simply type the first part of the command, and drag-and-drop the file into the terminal window, then hit enter.  
-*Take note of what version you're downloading, as this number changes on each update.
+If you are unsure about `/PATH/TO/DOWNLOAD/`, type the first part of the command, drag the file into the terminal window, then press enter. Note which version you are downloading, as the number changes on each update.
 
 ---
 

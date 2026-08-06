@@ -3,25 +3,25 @@ title: Add Mod Files to Your Catalog
 description: Register mod files in the system catalog for use in game instances.
 ---
 
-Before you can assemble a **Protocol**, you'll need to have some **mod files** registered in the system catalog. Think of the catalog as the armory — every weapon (mod) needs to be logged before it can be loaded into a mission.
+Before you can assemble a **Protocol**, you need some **mod files** registered in the system catalog. The catalog is where your mod files live before they are assigned to a protocol.
 
 ## Adding a Mod File
 
-Navigate to the **Install** page and switch to the **Mod Files** tab. This is your **Mod File Catalog** — a searchable database of all mod files the system knows about.
+Navigate to the **Install** page and switch to the **Mod Files** tab. This is your **Mod File Catalog**, a searchable database of all mod files the system knows about.
 
 ### Via the "Add to Catalog" dialog
 
 1. Click the **Add File** button at the top of the catalog table.
 2. In the dialog that opens:
    - Click the folder icon (`📂`) to browse your file system and select a mod file (`.pk3`, `.wad`, `.zip`, `.deh`, etc.)
-   - Give it a **Pretty Name** — this is how the mod will be referred to throughout the system. If your file is called `Project_Brutality_2.0b.pk3`, you might name it `Project Brutality Phase 2`.
+   - Give it a **Pretty Name**. This is how the mod is referred to throughout the system. If your file is called `Project_Brutality_2.0b.pk3`, you might name it `Project Brutality Phase 2`.
    - Optionally add a **Version** (e.g. `2.0b`)
    - Optionally add a **URL** linking to the mod's ModDB page, forum thread, or source
    - Optionally pick a **Category** (e.g. `weapon_mod`, `map_pack`) to help organise your catalog.
    - **Load Order** lets you specify other mod files this one depends on. The system will automatically load dependencies before this mod when launching. You can reorder dependencies by dragging them, or remove them with the trash icon.
    - If importing a `.zip` file that contains multiple supported files, the system will detect them and let you set their relative load order right from the import popup.
    - Toggle **Sidecar mod** if this file doesn't work on its own and is only meant to be loaded alongside another mod.
-   - **Settings File** — if the mod comes with a suggested `settings.cfg`, you can link it here. A copy will be created for each protocol using this mod. When a config is attached, the system seeds an isolated copy per Protocol so that tweaks in one session don't bleed into others.
+   - **Settings File**. If the mod comes with a suggested `settings.cfg`, you can link it here. A copy is created for each protocol using this mod, so tweaks in one session do not bleed into others.
 3. Click **Add to Catalog**. The system will copy the file to your mods directory with an MD5 hash-based filename to prevent collisions, and register it in the catalog.
 
 The file is now available in the catalog and can be assigned to any **Protocol** via the **Mod File Selector** dropdown on the Install page.
@@ -54,27 +54,27 @@ Looking for mods to play? Here are the best places to find Doom mods of all kind
 | Site | Best for |
 |------|----------|
 | **[ModDB](https://www.moddb.com/games/doom-ii/mods)** | The largest collection of Doom mods anywhere. Most major mods (Project Brutality, Hideous Destructor, Ashes 2063, etc.) have their main release here. |
-| **[Doomworld / idgames](https://www.doomworld.com/idgames/)** | The original Doom mod archive — 20,000+ files going back decades. Great for classic maps, weapon mods, and obscure gems. Can be browsed through the [Doomworld frontend](https://www.doomworld.com/idgames/) or directly via the [/idgames FTP](https://www.doomworld.com/idgames/). |
-| [Itch.io](https://itch.io/tag/doom) | A great source for everything related to indie games and indie developers, and has a increasing number of Doom mods as well. Itch.io is often times a very good way to also support mod developers, as you often are able to "Pay what you want" for a game or mod, or simply download it for free.| 
+| **[Doomworld / idgames](https://www.doomworld.com/idgames/)** | The original Doom mod archive, 20,000+ files going back decades. Great for classic maps, weapon mods, and obscure gems. Can be browsed through the [Doomworld frontend](https://www.doomworld.com/idgames/) or directly via the [/idgames FTP](https://www.doomworld.com/idgames/). |
+| [Itch.io](https://itch.io/tag/doom) | Indie games and mods. A growing number of Doom mods are released here, often with "pay what you want" pricing, which is a good way to support the developers. |
 | **[Realm667](https://www.realm667.com/)** | A curated repository of weapon, monster, and texture packs. Especially good if you're making your own mods and need resources. |
 | **[GitHub](https://github.com/topics/doom-mod)** | Many modern mods are developed on GitHub. Search topics like `doom-mod`, `gzdoom`, `doom-wad` to find projects. |
 
 ### File formats to look for
 
-Most mod files come in one of these formats — UAC Launch Control supports all of them:
+Most mod files come in one of these formats, all of which UAC Launch Control supports:
 
 | Format | Description |
 |--------|-------------|
-| `.wad` | Classic Doom format — can be an IWAD (full game) or a PWAD (mod patch). |
+| `.wad` | Classic Doom format, can be an IWAD (full game) or a PWAD (mod patch). |
 | `.pk3` / `.pk7` | Zipped archive formats used by ZDoom-family ports. These are the most common format for modern mods. |
-| `.zip` | Supported natively by GZDoom/UZDoom — the app can also unpack it and let you import individual files. |
+| `.zip` | Supported natively by GZDoom/UZDoom, the app can also unpack it and let you import individual files. |
 | `.deh` / `.bex` | DeHackEd patches that modify game behavior (weapon stats, monster properties). |
 
 ### Tips
 
-- **Read the mod page** — This can make your experience way better as many mods specify which source port and version they require. Install that specific version (see the [Downloading Source Ports](/guides/downloading-source-ports/) guide).
-- **Load order matters** — when using multiple mods, the order they're loaded can affect compatibility. Check the mod description for recommended load orders and set them up in the **Load Order** field when adding files.
-- **Registry metadata** — if you have [UAC Registry Lookup](/reference/uac-registry/) enabled, the app will try to auto-fill names and versions when you add a file. The registry grows as the community contributes metadata.
+- **Read the mod page**: This can make your experience way better as many mods specify which source port and version they require. Install that specific version (see the [Downloading Source Ports](/guides/downloading-source-ports/) guide).
+- **Load order matters**: when using multiple mods, the order they're loaded can affect compatibility. Check the mod description for recommended load orders and set them up in the **Load Order** field when adding files.
+- **Registry metadata**: if you have [UAC Registry Lookup](/reference/uac-registry/) enabled, the app will try to auto-fill names and versions when you add a file. The registry grows as the community contributes metadata.
 
 ## Storage
 
